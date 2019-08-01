@@ -34,7 +34,7 @@ class Payment
 
     /**
      * @param string $uid
-     * @param int $amount
+     * @param string $amount
      * @param string $currency
      * @param int $timestamp
      */

@@ -55,17 +55,17 @@ class Service implements ServiceInterface
     /**
      * Tries update a payment using the Stripe SDK.
      *
-     * @param string $id
+     * @param string $uid
      *
      * @return Payment
      *
      * @throws Exception
      * @throws StripeException
      */
-    public function update(string $id): Payment
+    public function update(string $uid): Payment
     {
         try {
-            $response = PaymentIntent::retrieve($id);
+            $response = PaymentIntent::retrieve($uid);
             $response->confirm();
         } catch (\Exception $exception) {
             throw new Exception($exception);

@@ -20,12 +20,12 @@ interface Service
     /**
      * Tries update a payment.
      *
-     * @param string $id
+     * @param string $uid
      *
      * @return Payment
      *
      * @throws Exception
      * @throws StripeException
      */
-    public function update(string $id): Payment;
+    public function update(string $uid): Payment;
 }
