@@ -21,7 +21,7 @@ class ServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = new Service($_ENV['STRIPE_KEY']);
+        $this->service = new Service(getenv('STRIPE_KEY'));
     }
 
     /**
