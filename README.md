@@ -1,5 +1,8 @@
 # Payments
 
+[![Build Status](https://travis-ci.com/Pod-Point/payments-php.svg?branch=master)](https://travis-ci.com/Pod-Point/payments-php)
+[![codecov](https://codecov.io/gh/Pod-Point/payments-php/branch/master/graph/badge.svg)](https://codecov.io/gh/Pod-Point/payments-php)
+
 A payment service for PHP applications.
 
 
