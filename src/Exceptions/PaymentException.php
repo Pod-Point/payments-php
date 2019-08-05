@@ -1,8 +1,8 @@
 <?php
 
-namespace PodPoint\Payments;
+namespace PodPoint\Payments\Exceptions;
 
-class Exception extends \Exception
+class PaymentException extends \Exception
 {
     /**
      * @param \Throwable|null $previous

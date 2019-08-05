@@ -4,11 +4,15 @@ namespace PodPoint\Payments\Providers\Stripe;
 
 use PodPoint\Payments\Entity\Customer;
 use PodPoint\Payments\Entity\Payment;
-use PodPoint\Payments\Exception;
+use PodPoint\Payments\Entity\Refund;
+use PodPoint\Payments\Exceptions\PaymentException;
+use PodPoint\Payments\Exceptions\RefundException;
 use PodPoint\Payments\Providers\Stripe\Exception as StripeException;
 use PodPoint\Payments\Service as ServiceInterface;
+use Stripe\Charge;
 use Stripe\Customer as StripeCustomer;
 use Stripe\PaymentIntent;
+use Stripe\Refund as StripeRefund;
 use Stripe\Stripe;
 
 class Service implements ServiceInterface
@@ -33,7 +37,7 @@ class Service implements ServiceInterface
      *
      * @return Payment
      *
-     * @throws Exception
+     * @throws PaymentException
      * @throws StripeException
      */
     public function create(
@@ -56,7 +60,7 @@ class Service implements ServiceInterface
                 'metadata' => $metadata
             ]);
         } catch (\Exception $exception) {
-            throw new Exception($exception);
+            throw new PaymentException($exception);
         }
 
         if ($response->status !== PaymentIntent::STATUS_SUCCEEDED) {
@@ -73,7 +77,7 @@ class Service implements ServiceInterface
      *
      * @return Payment
      *
-     * @throws Exception
+     * @throws PaymentException
      * @throws StripeException
      */
     public function update(string $uid): Payment
@@ -82,7 +86,7 @@ class Service implements ServiceInterface
             $response = PaymentIntent::retrieve($uid);
             $response->confirm();
         } catch (\Exception $exception) {
-            throw new Exception($exception);
+            throw new PaymentException($exception);
         }
 
         if ($response->status !== PaymentIntent::STATUS_SUCCEEDED) {
@@ -110,5 +114,46 @@ class Service implements ServiceInterface
         ]);
 
         return new Customer($customer->id, $customer->email);
+    }
+
+    /**
+     * Creates Refund for provided Payment Intent id.
+     *
+     * @param string $intentId
+     * @param int|null $amount
+     * @param string|null $reason
+     * @param array|null $metadata
+     *
+     * @return Refund
+     *
+     * @throws RefundException
+     */
+    public function refund(
+        string $intentId,
+        ?int $amount = null,
+        ?string $reason = null,
+        ?array $metadata = []
+    ): Refund {
+        $intent = PaymentIntent::retrieve($intentId);
+
+        /** @var Charge $charge */
+        $charge = $intent->charges->data[0];
+
+        if (!$amount) {
+            $amount = $charge->amount;
+        }
+
+        /** @var StripeRefund $refund */
+        $refund = $charge->refund([
+            'amount' => $amount,
+            'reason' => $reason,
+            'metadata' => $metadata,
+        ]);
+
+        if ($refund->status !== StripeRefund::STATUS_SUCCEEDED) {
+            throw new RefundException($refund->failure_reason, $refund->status);
+        }
+
+        return new Refund($refund->id);
     }
 }
