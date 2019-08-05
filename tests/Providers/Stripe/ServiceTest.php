@@ -2,7 +2,7 @@
 
 namespace PodPoint\Payments\Tests\Providers\Stripe;
 
-use PodPoint\Payments\Payment;
+use PodPoint\Payments\Entity\Payment;
 use PodPoint\Payments\Providers\Stripe\Exception as StripeException;
 use PodPoint\Payments\Providers\Stripe\Service;
 use PodPoint\Payments\Tests\TestCase;

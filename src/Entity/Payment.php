@@ -1,6 +1,6 @@
 <?php
 
-namespace PodPoint\Payments;
+namespace PodPoint\Payments\Entity;
 
 class Payment
 {
