@@ -5,28 +5,14 @@ namespace PodPoint\Payments;
 class Card
 {
     /**
-     * The uid or unique identifier of the setup intent.
+     * The uid or unique identifier for a payment method.
      *
      * @var string
      */
     public $uid;
 
     /**
-     * The request identifier needed when recording a new card.
-     *
-     * @var string
-     */
-    public $requestId;
-
-    /**
-     * The customer card identifier.
-     *
-     * @var string
-     */
-    public $cardToken;
-
-    /**
-     * The timestamp the setup intent was created.
+     * The timestamp the card was created.
      *
      * @var int
      */
@@ -34,15 +20,11 @@ class Card
 
     /**
      * @param string $uid
-     * @param string $cardToken
-     * @param string $requestId
      * @param int $timestamp
      */
-    public function __construct(string $uid, string $cardToken, string $requestId, int $timestamp)
+    public function __construct(string $uid, int $timestamp)
     {
         $this->uid = $uid;
-        $this->cardToken = $cardToken;
-        $this->requestId = $requestId;
         $this->timestamp = $timestamp;
     }
 }

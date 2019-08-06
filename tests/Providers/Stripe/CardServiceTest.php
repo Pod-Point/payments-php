@@ -2,8 +2,8 @@
 
 namespace PodPoint\Payments\Tests\Providers\Stripe;
 
-use PodPoint\Payments\Card;
 use PodPoint\Payments\Providers\Stripe\CardService;
+use PodPoint\Payments\Providers\Stripe\Exception as StripeException;
 use PodPoint\Payments\Tests\TestCase;
 
 class CardServiceTest extends TestCase
@@ -24,12 +24,12 @@ class CardServiceTest extends TestCase
     }
 
     /**
-     * Tests that a payment can be created successfully.
+     * Tests that creating a new Card will throw an exception because the status won't be STATUS_SUCCEEDED.
      */
     public function testCreate()
     {
-        $card = $this->service->create();
+        $this->expectException(StripeException::class);
 
-        $this->assertInstanceOf(Card::class, $card);
+        $this->service->create();
     }
 }

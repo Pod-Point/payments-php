@@ -2,12 +2,13 @@
 
 namespace PodPoint\Payments\Providers\Stripe;
 
-use PodPoint\Payments\Exception;
-use PodPoint\Payments\Service as ServiceInterface;
 use PodPoint\Payments\Card;
+use PodPoint\Payments\CardService as CardServiceInterface;
+use PodPoint\Payments\Exception;
+use PodPoint\Payments\Providers\Stripe\Exception as StripeException;
 use Stripe\SetupIntent;
 
-class CardService extends Base
+class CardService extends Base implements CardServiceInterface
 {
     /**
      * Tries create a setup card request using the Stripe SDK.
@@ -15,6 +16,7 @@ class CardService extends Base
      * @return Card
      *
      * @throws Exception
+     * @throws StripeException
      */
     public function create(): Card
     {
@@ -26,38 +28,10 @@ class CardService extends Base
             throw new Exception($exception);
         }
 
-        if (!in_array($response->status, [
-            SetupIntent::STATUS_REQUIRES_PAYMENT_METHOD,
-            SetupIntent::STATUS_SUCCEEDED,
-        ])) {
+        if ($response->status !== SetupIntent::STATUS_SUCCEEDED) {
             throw new StripeException($response);
         }
 
-        return new Card($response->id, '', $response->client_secret, $response->created);
-    }
-
-    /**
-     * Tries to update a card request using the Stripe SDK.
-     *
-     * @return Card
-     *
-     * @throws Exception
-     */
-    public function update(string $uid): Card
-    {
-        try {
-            $response = SetupIntent::retrieve($uid);
-        } catch (\Exception $exception) {
-            throw new Exception($exception);
-        }
-
-        if (!in_array($response->status, [
-            SetupIntent::STATUS_REQUIRES_PAYMENT_METHOD,
-            SetupIntent::STATUS_SUCCEEDED,
-        ])) {
-            throw new StripeException($response);
-        }
-
-        return new Card($response->id, $response->payment_method, $response->client_secret, $response->created);
+        return new Card($response->payment_method, $response->created);
     }
 }
