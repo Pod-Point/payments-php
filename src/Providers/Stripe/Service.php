@@ -6,7 +6,6 @@ use PodPoint\Payments\Entity\Customer;
 use PodPoint\Payments\Entity\Payment;
 use PodPoint\Payments\Entity\Refund;
 use PodPoint\Payments\Exceptions\PaymentException;
-use PodPoint\Payments\Exceptions\RefundException;
 use PodPoint\Payments\Providers\Stripe\Exception as StripeException;
 use PodPoint\Payments\Service as ServiceInterface;
 use Stripe\Charge;
@@ -133,7 +132,7 @@ class Service implements ServiceInterface
      * @return Refund
      *
      * @throws PaymentException
-     * @throws RefundException
+     * @throws StripeException
      */
     public function refund(
         string $intentId,
@@ -166,9 +165,7 @@ class Service implements ServiceInterface
         }
 
         if ($refund->status !== StripeRefund::STATUS_SUCCEEDED) {
-            throw new RefundException(
-                "Reason: {$refund->failure_reason}, Status: {$refund->status}"
-            );
+            throw new StripeException($refund);
         }
 
         return new Refund($refund->id);

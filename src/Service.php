@@ -6,7 +6,6 @@ use PodPoint\Payments\Entity\Customer;
 use PodPoint\Payments\Entity\Payment;
 use PodPoint\Payments\Entity\Refund;
 use PodPoint\Payments\Exceptions\PaymentException;
-use PodPoint\Payments\Exceptions\RefundException;
 use PodPoint\Payments\Providers\Stripe\Exception as StripeException;
 
 interface Service
@@ -68,7 +67,7 @@ interface Service
      *
      * @return Refund
      *
-     * @throws RefundException
+     * @throws StripeException
      * @throws PaymentException
      */
     public function refund(
