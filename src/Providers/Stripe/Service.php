@@ -7,18 +7,9 @@ use PodPoint\Payments\Payment;
 use PodPoint\Payments\Providers\Stripe\Exception as StripeException;
 use PodPoint\Payments\Service as ServiceInterface;
 use Stripe\PaymentIntent;
-use Stripe\Stripe;
 
-class Service implements ServiceInterface
+class Service extends Base implements ServiceInterface
 {
-    /**
-     * @param string $key
-     */
-    public function __construct(string $key)
-    {
-        Stripe::setApiKey($key);
-    }
-
     /**
      * Tries make a payment using the Stripe SDK.
      *
