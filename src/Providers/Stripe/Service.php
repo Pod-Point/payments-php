@@ -60,7 +60,10 @@ class Service implements ServiceInterface
                 'metadata' => $metadata
             ]);
         } catch (\Exception $exception) {
-            throw new PaymentException($exception);
+            throw new PaymentException(
+                'Failed to create payment due to provider exception',
+                $exception
+            );
         }
 
         if ($response->status !== PaymentIntent::STATUS_SUCCEEDED) {
@@ -86,7 +89,10 @@ class Service implements ServiceInterface
             $response = PaymentIntent::retrieve($uid);
             $response->confirm();
         } catch (\Exception $exception) {
-            throw new PaymentException($exception);
+            throw new PaymentException(
+                'Failed to update payment due to provider exception',
+                $exception
+            );
         }
 
         if ($response->status !== PaymentIntent::STATUS_SUCCEEDED) {
@@ -126,6 +132,7 @@ class Service implements ServiceInterface
      *
      * @return Refund
      *
+     * @throws PaymentException
      * @throws RefundException
      */
     public function refund(
@@ -134,24 +141,34 @@ class Service implements ServiceInterface
         ?string $reason = null,
         ?array $metadata = []
     ): Refund {
-        $intent = PaymentIntent::retrieve($intentId);
+        try {
+            $intent = PaymentIntent::retrieve($intentId);
 
-        /** @var Charge $charge */
-        $charge = $intent->charges->data[0];
+            /** @var Charge $charge */
+            $charge = $intent->charges->data[0];
 
-        if (!$amount) {
-            $amount = $charge->amount;
+            if (!$amount) {
+                $amount = $charge->amount;
+            }
+
+            /** @var StripeRefund $refund */
+            $refund = StripeRefund::create([
+                'charge' => $charge->id,
+                'amount' => $amount,
+                'reason' => $reason,
+                'metadata' => $metadata,
+            ]);
+        } catch (\Exception $exception) {
+            throw new PaymentException(
+                'Failed to refund payment due to provider exception',
+                $exception
+            );
         }
 
-        /** @var StripeRefund $refund */
-        $refund = $charge->refund([
-            'amount' => $amount,
-            'reason' => $reason,
-            'metadata' => $metadata,
-        ]);
-
         if ($refund->status !== StripeRefund::STATUS_SUCCEEDED) {
-            throw new RefundException($refund->failure_reason, $refund->status);
+            throw new RefundException(
+                "Reason: {$refund->failure_reason}, Status: {$refund->status}"
+            );
         }
 
         return new Refund($refund->id);

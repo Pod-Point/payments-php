@@ -5,10 +5,11 @@ namespace PodPoint\Payments\Exceptions;
 class PaymentException extends \Exception
 {
     /**
+     * @param string $message
      * @param \Throwable|null $previous
      */
-    public function __construct(\Throwable $previous = null)
+    public function __construct(string $message, \Throwable $previous = null)
     {
-        parent::__construct('Failed to create payment due to provider exception', 1, $previous);
+        parent::__construct($message, 1, $previous);
     }
 }

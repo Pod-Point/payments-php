@@ -5,10 +5,11 @@ namespace PodPoint\Payments\Exceptions;
 class RefundException extends \Exception
 {
     /**
+     * @param string $message
      * @param \Throwable|null $previous
      */
-    public function __construct($message, $code, \Throwable $previous = null)
+    public function __construct(string $message, \Throwable $previous = null)
     {
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, 0, $previous);
     }
 }

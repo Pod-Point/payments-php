@@ -5,6 +5,7 @@ namespace PodPoint\Payments;
 use PodPoint\Payments\Entity\Customer;
 use PodPoint\Payments\Entity\Payment;
 use PodPoint\Payments\Entity\Refund;
+use PodPoint\Payments\Exceptions\PaymentException;
 use PodPoint\Payments\Exceptions\RefundException;
 use PodPoint\Payments\Providers\Stripe\Exception as StripeException;
 
@@ -21,6 +22,9 @@ interface Service
      * @param string $currency
      *
      * @return Payment
+     *
+     * @throws PaymentException
+     * @throws StripeException
      */
     public function create(
         string $token,
@@ -38,7 +42,7 @@ interface Service
      *
      * @return Payment
      *
-     * @throws Exception
+     * @throws PaymentException
      * @throws StripeException
      */
     public function update(string $uid): Payment;
@@ -65,6 +69,7 @@ interface Service
      * @return Refund
      *
      * @throws RefundException
+     * @throws PaymentException
      */
     public function refund(
         string $intentId,
