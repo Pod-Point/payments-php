@@ -16,6 +16,10 @@ composer require pod-point/payments-php
 
 ## Usage
 
+When performing actions using a payment service, a provider-specific exception will be thrown if it's requirements to perform that action are not met. This exception will contain the data received from the provider which can be used by the consuming application to resolve any issues. 
+
+For example, when trying to make a payment with the Stripe payment service, if authorisation is required, an exception will be thrown with a "payment intent" object which can be used by a clients Stripe SDK to carry out the authorisation.
+
 ### Laravel
 
 For Laravel applications, bind the payment service interface to an instance of a provider payment service within an application service provider.
