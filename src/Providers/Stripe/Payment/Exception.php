@@ -1,6 +1,6 @@
 <?php
 
-namespace PodPoint\Payments\Providers\Stripe;
+namespace PodPoint\Payments\Providers\Stripe\Payment;
 
 use Stripe\PaymentIntent;
 
@@ -19,7 +19,7 @@ class Exception extends \Exception
      */
     public function __construct(PaymentIntent $response, \Throwable $previous = null)
     {
-        parent::__construct('Failed to create payment due to Stripe API response', 2, $previous);
+        parent::__construct('Failed to create payment due to Stripe API response', 1, $previous);
 
         $this->response = $response;
     }
