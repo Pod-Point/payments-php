@@ -1,6 +1,6 @@
 <?php
 
-namespace PodPoint\Payments\Tests\Providers\Stripe;
+namespace PodPoint\Payments\Tests\Providers\Stripe\Payment;
 
 use PodPoint\Payments\Payment;
 use PodPoint\Payments\Providers\Stripe\Payment\Exception as StripeException;
