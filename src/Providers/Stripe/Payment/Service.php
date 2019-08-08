@@ -48,30 +48,31 @@ class Service implements ServiceInterface
     }
 
     /**
-     * Tries make a payment using the Stripe SDK.
-     *
-     * @param int $amount
-     * @param Token $token
+     * @param string $token
+     * @param string $customerId
+     * @param int|null $amount
      * @param string $currency
      *
      * @return Payment
      *
-     * @throws StripeException
+     * @throws Exception
      */
-    public function create(Token $token, int $amount = null, string $currency = 'GBP'): Payment
+    public function create(string $token, string $customerId, int $amount = null, string $currency = 'GBP'): Payment
     {
-        switch ($token->type) {
+        $tokenType = $this->getTokenType($token);
+
+        switch ($tokenType) {
             case StripeToken::PAYMENT_INTENT:
                 /** @var PaymentIntent $response */
-                $response = PaymentIntent::retrieve($token->value);
+                $response = PaymentIntent::retrieve($token);
                 break;
             case StripeToken::PAYMENT_METHOD:
                 /** @var PaymentIntent $response */
                 $response = PaymentIntent::create([
-                    'payment_method' => $token->value,
+                    'payment_method' => $token,
                     'amount' => $amount,
                     'currency' => $currency,
-                    'customer' => $token->customer,
+                    'customer' => $customerId,
                     'confirmation_method' => 'manual',
                     'confirm' => true,
                     'off_session' => true,
@@ -82,7 +83,7 @@ class Service implements ServiceInterface
             case StripeToken::CUSTOMER:
                 /** @var Charge $response */
                 $response = Charge::create([
-                    'customer' => $token->value,
+                    'customer' => $token,
                     'amount' => $amount,
                     'currency' => $currency,
                 ]);
@@ -96,17 +97,51 @@ class Service implements ServiceInterface
         return new Payment($response->id, $response->currency, $response->amount, $response->created);
     }
 
-    public function refund(Token $token, int $amount): Refund
+    /**
+     * @param string $token
+     * @param int $amount
+     *
+     * @return Refund
+     */
+    public function refund(string $token, int $amount): Refund
     {
-        switch ($token->type) {
+        $tokenType = $this->getTokenType($token);
+
+        switch ($tokenType) {
             case StripeToken::PAYMENT_INTENT:
-                $intent = PaymentIntent::retrieve($token->value);
+                $refund = PaymentIntent::retrieve($token);
 
                 /** @var Charge $charge */
-                $charge = $intent->charges->data[0];
+                $charge = $refund->charges->data[0];
                 $charge->refund(['amount' => $amount]);
+                break;
+            case StripeToken::CUSTOMER:
+                $refund = \Stripe\Refund::create([
+                    'charge' => $token,
+                    'amount' => $amount,
+                ]);
+                break;
+        }
+
+        return new Refund($refund->id);
+    }
+
+    /**
+     * @param string $token
+     *
+     * @return string
+     */
+    private function getTokenType(string $token): string
+    {
+        switch (trim(substr($token, 0, 2))) {
+            case 'pi':
+                return StripeToken::PAYMENT_INTENT;
+            case 'pm':
+                return StripeToken::PAYMENT_METHOD;
+            case 'ch':
+                return StripeToken::CUSTOMER;
             default:
-                // BC for charges
+                return 'unidentified';
         }
     }
 
