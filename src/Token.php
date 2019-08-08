@@ -18,13 +18,18 @@ class Token
      */
     public $type;
 
+
+    public $customer;
+
     /**
      * @param string $value
      * @param string $type
+     * @param string $customer
      */
-    public function __construct(string $value, string $type)
+    public function __construct(string $value, string $type, string $customer)
     {
         $this->value = $value;
         $this->type = $type;
+        $this->customer = $customer;
     }
 }
