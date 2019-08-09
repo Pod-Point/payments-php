@@ -64,6 +64,13 @@ class Token
         return (substr(trim($token ?? $this->value), 0, $length) === $needle);
     }
 
+    /**
+     * Identifies card token.
+     *
+     * @param string $token
+     *
+     * @return bool
+     */
     public function isCard(string $token): bool
     {
         return $this->startsWith('card', $token);

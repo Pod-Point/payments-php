@@ -2,11 +2,11 @@
 
 namespace PodPoint\Payments;
 
-
 class Customer {
 
     /** @var string */
     public $uid;
+
     /** @var string */
     public $email;
 

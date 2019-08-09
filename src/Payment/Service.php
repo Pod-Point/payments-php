@@ -11,6 +11,8 @@ use PodPoint\Payments\Token;
 interface Service
 {
     /**
+     * Tries to make a payment.
+     *
      * @param Token $token
      * @param int $amount
      * @param string|null $description
@@ -21,7 +23,13 @@ interface Service
      *
      * @throws Exception
      */
-    public function create(Token $token, int $amount, string $description = null, array $metadata = [] , string $currency = 'GBP'): Payment;
+    public function create(
+        Token $token,
+        int $amount,
+        string $description = null,
+        array $metadata = [],
+        string $currency = 'GBP'
+    ): Payment;
 
     /**
      * @return CustomerService

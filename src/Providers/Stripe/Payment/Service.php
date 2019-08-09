@@ -38,8 +38,13 @@ class Service implements ServiceInterface
      *
      * @throws Exception
      */
-    public function create(Token $token, int $amount, string $description = null, array $metadata = [] , string $currency = 'GBP'): Payment
-    {
+    public function create(
+        Token $token,
+        int $amount,
+        string $description = null,
+        array $metadata = [],
+        string $currency = 'GBP'
+    ): Payment {
         switch ($token->type) {
             case StripeToken::CUSTOMER:
                 $paymentMethods = PaymentMethod::all([
