@@ -43,6 +43,8 @@ class Token
                 return StripeToken::PAYMENT_METHOD;
             case $this->startsWith('cus'):
                 return StripeToken::CUSTOMER;
+            case $this->startsWith('ch'):
+                return StripeToken::CHARGE;
             default:
                 return StripeToken::UNDEFINED;
         }
@@ -52,12 +54,18 @@ class Token
      * Checks chars from the beginning of the token.
      *
      * @param string $needle
+     * @param string|null $token
      *
      * @return bool
      */
-    private function startsWith(string $needle): bool
+    private function startsWith(string $needle, string $token = null): bool
     {
         $length = strlen($needle);
-        return (substr(trim($this->value), 0, $length) === $needle);
+        return (substr(trim($token ?? $this->value), 0, $length) === $needle);
+    }
+
+    public function isCard(string $token): bool
+    {
+        return $this->startsWith('card', $token);
     }
 }

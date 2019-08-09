@@ -24,7 +24,7 @@ class Service
     {
         switch ($token->type) {
             case StripeToken::PAYMENT_INTENT:
-                $refund = PaymentIntent::retrieve($token);
+                $refund = PaymentIntent::retrieve($token->value);
 
                 /** @var Charge $charge */
                 $charge = $refund->charges->data[0];
@@ -34,9 +34,9 @@ class Service
                     'metadata' => $metadata,
                 ]);
                 break;
-            case StripeToken::CUSTOMER:
+            case StripeToken::CHARGE:
                 $refund = \Stripe\Refund::create([
-                    'charge' => $token,
+                    'charge' => $token->value,
                     'amount' => $amount,
                     'reason' => $reason,
                     'metadata' => $metadata,

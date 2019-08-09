@@ -25,6 +25,9 @@ class Service implements ServiceInterface
     }
 
     /**
+     * Creates|confirms Payment.
+     * Includes backwards compatibilty in case payment method constains card token instead of payment method token.
+     *
      * @param Token $token
      * @param int $amount
      * @param string|null $description
@@ -44,7 +47,10 @@ class Service implements ServiceInterface
                     'type' => 'card',
                 ]);
 
-                if (empty($paymentMethods->data)) {
+                /** @var PaymentMethod $paymentMethod */
+                $paymentMethod = $paymentMethods->data[0];
+
+                if ($token->isCard($paymentMethod->id)) {
                     /** @var Charge $response */
                     $response = Charge::create([
                         'customer' => $token->value,
@@ -55,9 +61,6 @@ class Service implements ServiceInterface
                     ]);
                     break;
                 }
-
-                /** @var PaymentMethod $paymentMethod */
-                $paymentMethod = $paymentMethods->data[0];
 
                 $response = PaymentIntent::create([
                     'payment_method' => $paymentMethod->id,
