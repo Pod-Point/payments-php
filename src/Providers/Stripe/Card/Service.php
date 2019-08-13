@@ -1,26 +1,28 @@
 <?php
 
-namespace PodPoint\Payments\Providers\Stripe;
+namespace PodPoint\Payments\Providers\Stripe\Card;
 
+Use PodPoint\Payments\Providers\Stripe\Base;
 use PodPoint\Payments\Card;
-use PodPoint\Payments\CardService as CardServiceInterface;
+use PodPoint\Payments\Token;
+use PodPoint\Payments\Card\Service;
 use PodPoint\Payments\Exception;
 use PodPoint\Payments\Providers\Stripe\Exception as StripeException;
 use Stripe\SetupIntent;
 
-class CardService extends Base implements CardServiceInterface
+class CardService extends Base implements Service
 {
     /**
      * Tries create a card using the Stripe SDK.
      *
-     * @param string|null $token
+     * @param Token|null $token
      *
      * @return Card
      *
      * @throws Exception
      * @throws StripeException
      */
-    public function create($token = null): Card
+    public function create(Token $token = null): Card
     {
         try {
             if (is_null($token)) {
@@ -29,7 +31,7 @@ class CardService extends Base implements CardServiceInterface
                     'payment_method_types' => ['card'],
                 ]);
             } else {
-                $response = SetupIntent::retrieve($token);
+                $response = SetupIntent::retrieve($token->value);
             }
         } catch (\Exception $exception) {
             throw new Exception($exception);
