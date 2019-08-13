@@ -2,6 +2,7 @@
 
 namespace PodPoint\Payments\Customer;
 
+use PodPoint\Payments\Card;
 use PodPoint\Payments\Customer;
 use PodPoint\Payments\Token;
 
@@ -12,10 +13,11 @@ interface Service
      *
      * @param string $email
      * @param string $description
+     * @param Card|null $card
      *
      * @return Customer
      */
-    public function create(string $email, string $description): Customer;
+    public function create(string $email, string $description, Card $card = null): Customer;
 
     /**
      * Tries retrieve a Customer
@@ -24,5 +26,5 @@ interface Service
      *
      * @return Customer
      */
-    public function update(Token $token): Customer;
+    public function retrieve(Token $token): Customer;
 }

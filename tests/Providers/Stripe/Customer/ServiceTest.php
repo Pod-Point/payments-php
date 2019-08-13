@@ -41,7 +41,7 @@ class ServiceTest extends TestCase
     /**
      * Tests can retrieve an existing customer.
      */
-    public function testUpdateCustomer()
+    public function testRetrieveCustomer()
     {
         $email = uniqid() . '@test.test';
         $description = "This is $email test decription";
@@ -50,7 +50,7 @@ class ServiceTest extends TestCase
 
         $token = new Token($customer->uid, StripeToken::CUSTOMER);
 
-        $customer = $this->service->update($token);
+        $customer = $this->service->retrieve($token);
 
         $this->assertInstanceOf(Customer::class, $customer);
     }
@@ -58,12 +58,12 @@ class ServiceTest extends TestCase
     /**
      * Tests that an exception is thrown when sending wrong token type.
      */
-    public function testUpdateWithWrongTokenTypeThrowException()
+    public function testRetrieveWithWrongTokenTypeThrowException()
     {
         $token = new Token('wrong _value', 'wrong_type');
 
         $this->expectException(\Exception::class);
 
-        $this->service->update($token);
+        $this->service->retrieve($token);
     }
 }

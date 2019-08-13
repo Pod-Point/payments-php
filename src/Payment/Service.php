@@ -13,8 +13,9 @@ interface Service
      * @param Token $token
      * @param int $amount
      * @param string $currency
+     * @param array $metadata
      *
      * @return Payment
      */
-    public function create(Token $token, int $amount, string $currency = 'GBP'): Payment;
+    public function create(Token $token, int $amount = 0, string $currency = 'GBP', array $metadata = []): Payment;
 }

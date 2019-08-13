@@ -20,28 +20,31 @@ class Service extends Base implements ServiceInterface
      * @param Token $token
      * @param int $amount
      * @param string $currency
+     * @param array $metadata
      *
      * @return Payment
      *
      * @throws StripeException
      */
-    public function create(Token $token, int $amount, string $currency = 'GBP'): Payment
+    public function create(Token $token, int $amount = 0, string $currency = 'GBP', array $metadata = []): Payment
     {
         switch ($token->type) {
             case StripeToken::PAYMENT_INTENT:
                 /** @var PaymentIntent $response */
                 $response = PaymentIntent::retrieve($token->value);
-                $response->confirm();
+                $response = $response->confirm();
 
                 break;
             case StripeToken::PAYMENT_METHOD:
                 /** @var PaymentIntent $response */
                 $response = PaymentIntent::create([
-                    'payment_method' => $token->value,
                     'amount' => $amount,
                     'currency' => $currency,
                     'confirmation_method' => 'manual',
                     'confirm' => true,
+                    'payment_method' => $token->value,
+                    "payment_method_types" => ["card"],
+                    'metadata' => $metadata,
                 ]);
 
                 break;
@@ -52,6 +55,17 @@ class Service extends Base implements ServiceInterface
                     'customer' => $token->value,
                     'amount' => $amount,
                     'currency' => $currency,
+                    'metadata'    => $metadata
+                ]);
+
+                break;
+            case StripeToken::TOKEN:
+                /** @var Card $response */
+                $response = Charge::create([
+                    'amount'      => $amount,
+                    'currency'    => $currency,
+                    'source'      => $token->value,
+                    'metadata'    => $metadata
                 ]);
 
                 break;
