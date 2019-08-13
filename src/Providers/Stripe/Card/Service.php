@@ -2,15 +2,16 @@
 
 namespace PodPoint\Payments\Providers\Stripe\Card;
 
-Use PodPoint\Payments\Providers\Stripe\Base;
 use PodPoint\Payments\Card;
-use PodPoint\Payments\Token;
-use PodPoint\Payments\Card\Service;
+use PodPoint\Payments\Card\Service as ServiceInterface;
 use PodPoint\Payments\Exception;
-use PodPoint\Payments\Providers\Stripe\Exception as StripeException;
+Use PodPoint\Payments\Providers\Stripe\Base;
+use PodPoint\Payments\Providers\Stripe\Card\Exception as StripeException;
+use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
+use PodPoint\Payments\Token;
 use Stripe\SetupIntent;
 
-class CardService extends Base implements Service
+class Service extends Base implements ServiceInterface
 {
     /**
      * Tries create a card using the Stripe SDK.
@@ -24,17 +25,15 @@ class CardService extends Base implements Service
      */
     public function create(Token $token = null): Card
     {
-        try {
-            if (is_null($token)) {
-                $response = SetupIntent::create([
-                    'usage' => 'on_session',
-                    'payment_method_types' => ['card'],
-                ]);
-            } else {
-                $response = SetupIntent::retrieve($token->value);
-            }
-        } catch (\Exception $exception) {
-            throw new Exception($exception);
+        if (is_null($token)) {
+            $response = SetupIntent::create([
+                'usage' => 'on_session',
+                'payment_method_types' => ['card'],
+            ]);
+        } else if ($token->type === StripeToken::SETUP_INTENT) {
+            $response = SetupIntent::retrieve($token->value);
+        } else {
+            throw new \Exception("You either need to pass a null Token or a setup intent one.");
         }
 
         if ($response->status !== SetupIntent::STATUS_SUCCEEDED) {

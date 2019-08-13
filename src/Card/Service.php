@@ -8,11 +8,11 @@ use PodPoint\Payments\Token;
 interface Service
 {
     /**
-     * Tries make a payment.
+     * Tries create a card.
      *
      * @param Token|null $token
      *
      * @return Card
      */
-    public function create(Token $token = null): Payment;
+    public function create(Token $token = null): Card;
 }

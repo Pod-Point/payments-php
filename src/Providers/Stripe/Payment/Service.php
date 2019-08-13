@@ -2,10 +2,10 @@
 
 namespace PodPoint\Payments\Providers\Stripe\Payment;
 
-Use PodPoint\Payments\Providers\Stripe\Base;
 use PodPoint\Payments\Payment;
 use PodPoint\Payments\Providers\Stripe\Payment\Exception as StripeException;
 use PodPoint\Payments\Payment\Service as ServiceInterface;
+Use PodPoint\Payments\Providers\Stripe\Base;
 use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 use PodPoint\Payments\Token;
 use Stripe\Card;

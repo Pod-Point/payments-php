@@ -1,6 +1,6 @@
 <?php
 
-namespace PodPoint\Payments\Providers\Stripe\Payment;
+namespace PodPoint\Payments\Providers\Stripe\Card;
 
 use Stripe\SetupIntent;
 
