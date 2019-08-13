@@ -17,17 +17,18 @@ class Service extends Base implements ServiceInterface
      * Tries create a card using the Stripe SDK.
      *
      * @param Token|null $token
+     * @param string usage
      *
      * @return Card
      *
      * @throws Exception
      * @throws StripeException
      */
-    public function create(Token $token = null): Card
+    public function create(Token $token = null, string $usage = 'on_session'): Card
     {
         if (is_null($token)) {
             $response = SetupIntent::create([
-                'usage' => 'on_session',
+                'usage' => $usage,
                 'payment_method_types' => ['card'],
             ]);
         } else if ($token->type === StripeToken::SETUP_INTENT) {

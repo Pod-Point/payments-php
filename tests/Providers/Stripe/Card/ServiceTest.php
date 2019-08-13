@@ -6,7 +6,6 @@ use PodPoint\Payments\Card;
 use PodPoint\Payments\Token;
 use PodPoint\Payments\Providers\Stripe\Card\Exception as StripeException;
 use PodPoint\Payments\Providers\Stripe\Card\Service;
-use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 use PodPoint\Payments\Tests\TestCase;
 
 class ServiceTest extends TestCase
@@ -34,10 +33,9 @@ class ServiceTest extends TestCase
         try {
             $this->service->create();
         } catch (StripeException $exception) {
-            $expected = null;
             $actual = $exception->getResponse()->client_secret;
 
-            $this->assertNotEquals($expected, $actual);
+            $this->assertNotNull($actual);
         }
     }
 
