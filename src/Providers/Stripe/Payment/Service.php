@@ -117,6 +117,11 @@ class Service implements ServiceInterface
         return new Payment($response->id, $response->currency, $response->amount, $response->created);
     }
 
+    public function getProviderName(): string
+    {
+        return 'stripe';
+    }
+
     public function customers(): CustomerService
     {
         return new CustomerService();

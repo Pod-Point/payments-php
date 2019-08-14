@@ -4,6 +4,7 @@ namespace PodPoint\Payments\Payment;
 
 use PodPoint\Payments\Payment;
 use PodPoint\Payments\Providers\Stripe\Payment\Exception;
+use PodPoint\Payments\Providers\Stripe\Card\Service as CardService;
 use PodPoint\Payments\Providers\Stripe\Customer\Service as CustomerService;
 use PodPoint\Payments\Providers\Stripe\Refund\Service as RefundService;
 use PodPoint\Payments\Token;
@@ -33,6 +34,13 @@ interface Service
     ): Payment;
 
     /**
+     * Return the name of the provider.
+     *
+     * @return string
+     */
+    public function getProviderName(): string;
+
+    /**
      * @return CustomerService
      */
     public function customers(): CustomerService;
@@ -41,4 +49,9 @@ interface Service
      * @return RefundService
      */
     public function refunds(): RefundService;
+
+    /**
+     * @return CardService
+     */
+    public function cards(): CardService;
 }
