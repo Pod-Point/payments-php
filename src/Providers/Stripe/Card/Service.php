@@ -11,20 +11,63 @@ use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 use PodPoint\Payments\Token;
 use Stripe\SetupIntent;
 use Stripe\PaymentMethod;
+use Stripe\Customer as StripeCustomer;
 
 class Service implements ServiceInterface
 {
     /**
      * Tries attach a card to a customer using the Stripe SDK.
      *
-     * @param Card $card
-     * @param Customer $customer
+     * @param Token $cardToken
+     * @param Token $customerToken
+     *
+     * @return Card
      */
-    public function attach(Card $card, Customer $customer): void
+    public function attach(Token $cardToken, Token $customerToken): Card
     {
-        $paymentMethod = PaymentMethod::retrieve($card->uid);
+        if ($cardToken->type === StripeToken::PAYMENT_METHOD && $customerToken->type === StripeToken::CUSTOMER) {
+            throw new \Exception('You need to provide a valid card Token and customer Token');
+        }
 
-        $paymentMethod->attach(['customer' => $customer->uid]);
+        $paymentMethod = PaymentMethod::retrieve($cardToken->value);
+
+        $response = $paymentMethod->attach(['customer' => $customerToken->value]);
+
+        return new Card($response->payment_method, $paymentMethod->card->__toArray());
+    }
+
+    /**
+     * Tries remove a card using the Stripe SDK.
+     *
+     * @param Token $cardToken
+     * @param Token|null $customerToken
+     */
+    public function remove(Token $cardToken, Token $customerToken = null): void
+    {
+        if (!in_array($cardToken->type, [
+            StripeToken::PAYMENT_METHOD,
+            StripeToken::CARD
+        ])) {
+            throw new \Exception('You need to provide a valid card/payment method Token.');
+        }
+
+        switch ($cardToken->type) {
+            case StripeToken::PAYMENT_METHOD:
+                $paymentMethod = PaymentMethod::retrieve($cardToken->value);
+
+                $paymentMethod->detach();
+
+                break;
+            case StripeToken::CARD:
+                if ($customerToken->type === StripeToken::CUSTOMER) {
+                    throw new \Exception('You need to provide a valid customer Token.');
+                }
+
+                StripeCustomer::deleteSource($customerToken->value, $cardToken->value);
+
+                break;
+        }
+
     }
 
     /**
@@ -60,7 +103,7 @@ class Service implements ServiceInterface
             throw new StripeException($response);
         }
 
-        return new Card($response->payment_method, $response->created);
+        return new Card($response->payment_method, $response->card->__toArray());
     }
 
     /**
@@ -84,7 +127,15 @@ class Service implements ServiceInterface
 
                 if (isset($paymentMethods->data) && $paymentMethods->data) {
                     foreach ($paymentMethods->data as $paymentMethod) {
-                        $cards[] = new Card($paymentMethod->id, $paymentMethod->created, $paymentMethod->card->__toArray());
+                        $cards[] = new Card($paymentMethod->id, $paymentMethod->card->__toArray());
+                    }
+                }
+
+                $customer = Customer::retrieve($token->value);
+
+                if (isset($customer->cards->data) && $customer->cards->data) {
+                    foreach ($customer->cards->data as $card) {
+                        $cards[] = new Card($card->id, $card->__toArray());
                     }
                 }
 

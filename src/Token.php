@@ -41,6 +41,8 @@ class Token
                 return StripeToken::PAYMENT_INTENT;
             case $this->startsWith('pm'):
                 return StripeToken::PAYMENT_METHOD;
+            case $this->startsWith('card'):
+                    return StripeToken::CARD;
             case $this->startsWith('cus'):
                 return StripeToken::CUSTOMER;
             case $this->startsWith('ch'):
