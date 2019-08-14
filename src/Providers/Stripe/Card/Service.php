@@ -73,7 +73,7 @@ class Service implements ServiceInterface
     /**
      * Tries create a card using the Stripe SDK.
      *
-     * @param Token|null $token
+     * @param Token $token
      * @param array $params
      *
      * @return Card
@@ -81,9 +81,9 @@ class Service implements ServiceInterface
      * @throws Exception
      * @throws StripeException
      */
-    public function create(Token $token = null, array $params = []): Card
+    public function create(Token $token, array $params = []): Card
     {
-        if (is_null($token)) {
+        if ($token->type === StripeToken::UNDEFINED) {
             $params = array_merge(
                 [
                     'usage' => 'on_session',

@@ -13,20 +13,20 @@ class Service implements ServiceInterface
     /**
      * Tries create a customer using the Stripe SDK can be initiated with attached method|card based on incoming token type.
      *
+     * @param Token $token
      * @param string $email
      * @param string $description
-     * @param Token|null $token
      *
      * @return Customer
      */
-    public function create(string $email, string $description, Token $token = null): Customer
+    public function create(Token $token, string $email, string $description): Customer
     {
         $params = [
             'email' => $email,
             'description' => $description,
         ];
 
-        if ($token) {
+        if ($token AND $token->type !== StripeToken::UNDEFINED) {
             if ($token->type === StripeToken::PAYMENT_METHOD) {
                 $params['payment_method'] = $token->value;
             } else {
