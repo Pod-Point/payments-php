@@ -2,10 +2,9 @@
 
 namespace PodPoint\Payments\Tests\Providers\Stripe\Card;
 
-use PodPoint\Payments\Card;
 use PodPoint\Payments\Token;
 use PodPoint\Payments\Providers\Stripe\Card\Exception as StripeException;
-use PodPoint\Payments\Providers\Stripe\Card\Service;
+use PodPoint\Payments\Providers\Stripe\Payment\Service;
 use PodPoint\Payments\Tests\TestCase;
 
 class ServiceTest extends TestCase
@@ -31,7 +30,7 @@ class ServiceTest extends TestCase
     public function testCreateSetupIntentThrowStripeException()
     {
         try {
-            $this->service->create();
+            $this->service->cards()->create();
         } catch (StripeException $exception) {
             $actual = $exception->getResponse()->client_secret;
 
@@ -48,6 +47,6 @@ class ServiceTest extends TestCase
 
         $this->expectException(\Exception::class);
 
-        $this->service->create($token);
+        $this->service->cards()->create($token);
     }
 }

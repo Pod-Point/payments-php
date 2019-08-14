@@ -2,34 +2,36 @@
 
 namespace PodPoint\Payments\Providers\Stripe\Customer;
 
-use PodPoint\Payments\Card;
+use PodPoint\Payments\Customer\Service as ServiceInterface;
 use PodPoint\Payments\Customer;
 use PodPoint\Payments\Token;
-use PodPoint\Payments\Customer\Service as ServiceInterface;
-Use PodPoint\Payments\Providers\Stripe\Base;
-use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 use Stripe\Customer as StripeCustomer;
+use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 
-class Service extends Base implements ServiceInterface
+class Service implements ServiceInterface
 {
     /**
-     * Tries create a customer using the Stripe SDK.
+     * Tries create a customer using the Stripe SDK can be initiated with attached method|card based on incoming token type.
      *
      * @param string $email
      * @param string $description
-     * @param Card|null $card
+     * @param Token|null $token
      *
      * @return Customer
      */
-    public function create(string $email, string $description, Card $card = null): Customer
+    public function create(string $email, string $description, Token $token = null): Customer
     {
         $params = [
             'email' => $email,
             'description' => $description,
         ];
 
-        if ($card) {
-            $params['payment_method'] = $card->uid;
+        if ($token) {
+            if ($token->type === StripeToken::PAYMENT_METHOD) {
+                $params['payment_method'] = $token->value;
+            } else {
+                $params['card'] = $token->value;
+            }
         }
 
         $response = StripeCustomer::create($params);

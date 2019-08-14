@@ -20,11 +20,11 @@ interface Service
      * Tries create a card.
      *
      * @param Token|null $token
-     * @param string $usage
+     * @param array $params
      *
      * @return Card
      */
-    public function create(Token $token = null, string $usage = 'on_session'): Card;
+    public function create(Token $token = null, array $params = []): Card;
 
     /**
      * Tries retrieve cards.

@@ -6,14 +6,13 @@ use PodPoint\Payments\Card;
 use PodPoint\Payments\Customer;
 use PodPoint\Payments\Card\Service as ServiceInterface;
 use PodPoint\Payments\Exception;
-Use PodPoint\Payments\Providers\Stripe\Base;
 use PodPoint\Payments\Providers\Stripe\Card\Exception as StripeException;
 use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 use PodPoint\Payments\Token;
 use Stripe\SetupIntent;
 use Stripe\PaymentMethod;
 
-class Service extends Base implements ServiceInterface
+class Service implements ServiceInterface
 {
     /**
      * Tries attach a card to a customer using the Stripe SDK.
@@ -32,20 +31,25 @@ class Service extends Base implements ServiceInterface
      * Tries create a card using the Stripe SDK.
      *
      * @param Token|null $token
-     * @param string usage
+     * @param array $params
      *
      * @return Card
      *
      * @throws Exception
      * @throws StripeException
      */
-    public function create(Token $token = null, string $usage = 'on_session'): Card
+    public function create(Token $token = null, array $params = []): Card
     {
         if (is_null($token)) {
-            $response = SetupIntent::create([
-                'usage' => $usage,
-                'payment_method_types' => ['card'],
-            ]);
+            $params = array_merge(
+                [
+                    'usage' => 'on_session',
+                    'payment_method_types' => ['card'],
+                ],
+                $params
+            );
+
+            $response = SetupIntent::create($params);
         } else if ($token->type === StripeToken::SETUP_INTENT) {
             $response = SetupIntent::retrieve($token->value);
         } else {
@@ -89,7 +93,6 @@ class Service extends Base implements ServiceInterface
                 throw new \Exception("You need to pass a Token with customer type.");
 
                 break;
-
         }
 
         return $cards;
