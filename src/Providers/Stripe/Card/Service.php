@@ -141,7 +141,7 @@ class Service implements ServiceInterface
 
                 break;
             default:
-                throw new \Exception("You need to pass a Token with customer type.");
+                throw new \Exception("You need to pass a customer Token.");
 
                 break;
         }
