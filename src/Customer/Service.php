@@ -10,13 +10,13 @@ interface Service
     /**
      * Tries create a Customer.
      *
+     * @param Token $token
      * @param string $email
      * @param string $description
-     * @param Token|null $token
      *
      * @return Customer
      */
-    public function create(string $email, string $description, Token $token = null): Customer;
+    public function create(Token $token, string $email, string $description): Customer;
 
     /**
      * Tries retrieve a Customer

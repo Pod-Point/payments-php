@@ -29,12 +29,12 @@ interface Service
     /**
      * Tries create a card.
      *
-     * @param Token|null $token
+     * @param Token $token
      * @param array $params
      *
      * @return Card
      */
-    public function create(Token $token = null, array $params = []): Card;
+    public function create(Token $token, array $params = []): Card;
 
     /**
      * Tries retrieve cards.
