@@ -131,7 +131,7 @@ class Service implements ServiceInterface
                     }
                 }
 
-                $customer = Customer::retrieve($token->value);
+                $customer = StripeCustomer::retrieve($token->value);
 
                 if (isset($customer->cards->data) && $customer->cards->data) {
                     foreach ($customer->cards->data as $card) {
