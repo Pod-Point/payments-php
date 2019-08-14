@@ -47,6 +47,8 @@ class Token
                 return StripeToken::CHARGE;
             case $this->startsWith('seti'):
                 return StripeToken::SETUP_INTENT;
+            case $this->startsWith('tok'):
+                return StripeToken::TOKEN;
             default:
                 return StripeToken::UNDEFINED;
         }
