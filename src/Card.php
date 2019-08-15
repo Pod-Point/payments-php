@@ -12,19 +12,55 @@ class Card
     public $uid;
 
     /**
-     * Data related to the card.
+     * Last 4 digits of the card.
      *
-     * @var array
+     * @var string
      */
-    public $data;
+    public $last4;
+
+    /**
+     * Brand of the card.
+     *
+     * @var string
+     */
+    public $brand;
+
+    /**
+     * Funding of the card.
+     *
+     * @var string
+     */
+    public $funding;
+
+    /**
+     * Expiration month of the card.
+     *
+     * @var int
+     */
+    public $expirationMonth;
+
+    /**
+     * Expiration month of the card.
+     *
+     * @var int
+     */
+    public $expirationYear;
 
     /**
      * @param string $uid
-     * @param array $data
+     * @param string $last4
+     * @param string $brand
+     * @param string $funding
+     * @param int $expirationMonth
+     * @param int $expirationYear
      */
-    public function __construct(string $uid, array $data = [])
+    public function __construct(string $uid, string $last4 = '', string $brand = '', string $funding = '', int $expirationMonth = 0, int $expirationYear = 0)
     {
         $this->uid = $uid;
-        $this->data = $data;
+        $this->last4 = $last4;
+        $this->brand = $brand;
+        $this->funding = $funding;
+        $this->expirationMonth = $expirationMonth;
+        $this->expirationYear = $expirationYear;
     }
 }

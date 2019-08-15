@@ -32,7 +32,14 @@ class Service implements ServiceInterface
 
         $response = $paymentMethod->attach(['customer' => $customerToken->value]);
 
-        return new Card($response->id,(array) $paymentMethod->card);
+        return new Card(
+            $response->id,
+            $response->card->last4,
+            $response->card->brand,
+            $response->card->funding,
+            $response->card->exp_month,
+            $response->card->exp_year
+        );
     }
 
     /**
@@ -82,27 +89,47 @@ class Service implements ServiceInterface
      */
     public function create(Token $token, array $params = []): Card
     {
-        if ($token->type === StripeToken::UNDEFINED) {
-            $params = array_merge(
-                [
-                    'usage' => 'on_session',
-                    'payment_method_types' => ['card'],
-                ],
-                $params
-            );
+        $tokenValue = null;
 
-            $response = SetupIntent::create($params);
-        } else if ($token->type === StripeToken::SETUP_INTENT) {
-            $response = SetupIntent::retrieve($token->value);
-        } else {
-            throw new \Exception('You either need to pass a null Token or a setup intent one.');
+        switch ($token->type) {
+            case StripeToken::UNDEFINED:
+                $params = array_merge(
+                    [
+                        'usage' => 'on_session',
+                        'payment_method_types' => ['card'],
+                    ],
+                    $params
+                );
+
+                $response = SetupIntent::create($params);
+
+                $tokenValue = $response->client_secret;
+
+                break;
+            case StripeToken::SETUP_INTENT:
+                $response = SetupIntent::retrieve($token->value);
+
+                break;
+            default:
+                throw new \Exception('You either need to pass a null Token or a setup intent one.');
         }
 
         if ($response->status !== SetupIntent::STATUS_SUCCEEDED) {
-            throw new StripeException($response);
+            $token = new Token($tokenValue);
+
+            throw new StripeException($token);
         }
 
-        return new Card($response->id, (array) $response->card);
+        $paymentMethod = PaymentMethod::retrieve($response->payment_method);
+
+        return new Card(
+            $paymentMethod->id,
+            $paymentMethod->card->last4,
+            $paymentMethod->card->brand,
+            $paymentMethod->card->funding,
+            $paymentMethod->card->exp_month,
+            $paymentMethod->card->exp_year
+        );
     }
 
     /**
@@ -126,7 +153,14 @@ class Service implements ServiceInterface
 
                 if (isset($paymentMethods->data) && $paymentMethods->data) {
                     foreach ($paymentMethods->data as $paymentMethod) {
-                        $cards[] = new Card($paymentMethod->id, (array) $paymentMethod->card);
+                        $cards[] = new Card(
+                            $paymentMethod->id,
+                            $paymentMethod->card->last4,
+                            $paymentMethod->card->brand,
+                            $paymentMethod->card->funding,
+                            $paymentMethod->card->exp_month,
+                            $paymentMethod->card->exp_year
+                        );
                     }
                 }
 
@@ -134,7 +168,14 @@ class Service implements ServiceInterface
 
                 if (isset($customer->cards->data) && $customer->cards->data) {
                     foreach ($customer->cards->data as $card) {
-                        $cards[] = new Card($card->id, (array) $card);
+                        $cards[] = new Card(
+                            $card->id,
+                            $card->last4,
+                            $card->brand,
+                            $card->funding,
+                            $card->exp_month,
+                            $card->exp_year
+                        );
                     }
                 }
 

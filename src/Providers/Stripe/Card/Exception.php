@@ -2,14 +2,14 @@
 
 namespace PodPoint\Payments\Providers\Stripe\Card;
 
-use Stripe\SetupIntent;
+use PodPoint\Payments\Token;
 
 class Exception extends \Exception
 {
     /**
      * The response from the Stripe API.
      *
-     * @var SetupIntent
+     * @var Token
      */
     private $response;
 

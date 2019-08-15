@@ -12,7 +12,6 @@ use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 use PodPoint\Payments\Token;
 use Stripe\Charge;
 use Stripe\PaymentIntent;
-use Stripe\PaymentMethod;
 use Stripe\Stripe;
 
 class Service implements ServiceInterface
