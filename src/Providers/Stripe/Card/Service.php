@@ -32,7 +32,7 @@ class Service implements ServiceInterface
 
         $response = $paymentMethod->attach(['customer' => $customerToken->value]);
 
-        return new Card($response->payment_method,(array) $paymentMethod->card);
+        return new Card($response->id,(array) $paymentMethod->card);
     }
 
     /**
@@ -102,7 +102,7 @@ class Service implements ServiceInterface
             throw new StripeException($response);
         }
 
-        return new Card($response->payment_method, (array) $response->card);
+        return new Card($response->id, (array) $response->card);
     }
 
     /**
