@@ -33,7 +33,7 @@ class Service implements ServiceInterface
      * @param string|null $description
      * @param array $metadata
      * @param string $currency
-     * @param array $metadata
+     * @param Token $customer
      *
      * @return Payment
      *
@@ -44,7 +44,8 @@ class Service implements ServiceInterface
         int $amount,
         string $description = null,
         array $metadata = [],
-        string $currency = 'GBP'
+        string $currency = 'GBP',
+        $customer = null
     ): Payment {
         switch ($token->type) {
             case StripeToken::CUSTOMER:
@@ -74,6 +75,7 @@ class Service implements ServiceInterface
                     "payment_method_types" => ["card"],
                     'description' => $description,
                     'metadata' => $metadata,
+                    'use_stripe_sdk' => true,
                 ]);
 
                 break;
@@ -94,9 +96,14 @@ class Service implements ServiceInterface
 
                 break;
             case StripeToken::PAYMENT_METHOD:
+                if ($customer && $customer->type !== StripeToken::CUSTOMER) {
+                    throw new \Exception('You need to pass a valid customer token to charge a card one.');
+                }
+
                 /** @var PaymentIntent $response */
                 $response = PaymentIntent::create([
                     'payment_method' => $token->value,
+                    'customer' => $customer->value,
                     'amount' => $amount,
                     'currency' => $currency,
                     'confirmation_method' => 'manual',
@@ -104,16 +111,19 @@ class Service implements ServiceInterface
                     "payment_method_types" => ["card"],
                     'description' => $description,
                     'metadata' => $metadata,
+                    'use_stripe_sdk' => true,
                 ]);
 
                 break;
         }
 
         if ($response instanceof PaymentIntent && $response->status !== PaymentIntent::STATUS_SUCCEEDED) {
-            throw new StripeException($response);
+            $token = new Token($response->client_secret);
+
+            throw new StripeException($token);
         }
 
-        return new Payment($response->id, $response->currency, $response->amount, $response->created);
+        return new Payment($response->id, $response->amount, $response->currency, $response->created);
     }
 
     public function getProviderName(): string

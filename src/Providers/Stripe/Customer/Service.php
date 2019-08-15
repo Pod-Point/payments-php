@@ -26,10 +26,21 @@ class Service implements ServiceInterface
             'description' => $description,
         ];
 
-        if ($token->type === StripeToken::PAYMENT_METHOD) {
-            $params['payment_method'] = $token->value;
-        } else {
-            $params['card'] = $token->value;
+        switch ($token->type) {
+            case StripeToken::PAYMENT_METHOD:
+                $params['payment_method'] = $token->value;
+
+                break;
+            case StripeToken::CARD:
+                $params['card'] = $token->value;
+
+                break;
+            case StripeToken::TOKEN:
+                $params['source'] = $token->value;
+
+                break;
+            default:
+                throw new \Exception ('Unexpected token type.');
         }
 
         $response = StripeCustomer::create($params);

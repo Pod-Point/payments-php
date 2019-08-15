@@ -14,7 +14,7 @@ class Payment
     /**
      * The payment amount.
      *
-     * @var string
+     * @var int
      */
     public $amount;
 
@@ -34,11 +34,11 @@ class Payment
 
     /**
      * @param string $uid
-     * @param string $amount
+     * @param int $amount
      * @param string $currency
      * @param int $timestamp
      */
-    public function __construct(string $uid, string $amount, string $currency, int $timestamp)
+    public function __construct(string $uid, int $amount, string $currency, int $timestamp)
     {
         $this->uid = $uid;
         $this->amount = $amount;

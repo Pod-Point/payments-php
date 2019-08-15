@@ -89,8 +89,6 @@ class Service implements ServiceInterface
      */
     public function create(Token $token, array $params = []): Card
     {
-        $tokenValue = null;
-
         switch ($token->type) {
             case StripeToken::UNDEFINED:
                 $params = array_merge(
@@ -103,8 +101,6 @@ class Service implements ServiceInterface
 
                 $response = SetupIntent::create($params);
 
-                $tokenValue = $response->client_secret;
-
                 break;
             case StripeToken::SETUP_INTENT:
                 $response = SetupIntent::retrieve($token->value);
@@ -115,7 +111,7 @@ class Service implements ServiceInterface
         }
 
         if ($response->status !== SetupIntent::STATUS_SUCCEEDED) {
-            $token = new Token($tokenValue);
+            $token = new Token($response->client_secret);
 
             throw new StripeException($token);
         }
