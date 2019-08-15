@@ -6,11 +6,12 @@ use PodPoint\Payments\Customer;
 use PodPoint\Payments\Token;
 use Stripe\Customer as StripeCustomer;
 use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
+use PodPoint\Payments\Customer\Service as CustomerInterface;
 
-class Service
+class Service implements CustomerInterface
 {
     /**
-     * Creates new Customer with attached method|card based on incoming token type.
+     * Tries to create a customer using the Stripe SDK.
      *
      * @param Token $token
      * @param string $email

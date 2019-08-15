@@ -4,8 +4,8 @@ namespace PodPoint\Payments\Payment;
 
 use PodPoint\Payments\Payment;
 use PodPoint\Payments\Providers\Stripe\Payment\Exception;
-use PodPoint\Payments\Providers\Stripe\Customer\Service as CustomerService;
-use PodPoint\Payments\Providers\Stripe\Refund\Service as RefundService;
+use PodPoint\Payments\Customer\Service as CustomerService;
+use PodPoint\Payments\Refund\Service as RefundService;
 use PodPoint\Payments\Token;
 
 interface Service
@@ -15,9 +15,9 @@ interface Service
      *
      * @param Token $token
      * @param int $amount
+     * @param string $currency
      * @param string|null $description
      * @param array $metadata
-     * @param string $currency
      *
      * @return Payment
      *
@@ -26,9 +26,9 @@ interface Service
     public function create(
         Token $token,
         int $amount,
+        string $currency = 'GBP',
         string $description = null,
-        array $metadata = [],
-        string $currency = 'GBP'
+        array $metadata = []
     ): Payment;
 
     /**

@@ -2,8 +2,8 @@
 
 namespace PodPoint\Payments;
 
-class Customer {
-
+class Customer
+{
     /** @var string */
     public $uid;
 

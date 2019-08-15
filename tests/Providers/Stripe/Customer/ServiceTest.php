@@ -4,8 +4,8 @@ namespace PodPoint\Payments\Tests\Providers\Stripe\Customer;
 
 use PodPoint\Payments\Customer;
 use PodPoint\Payments\Providers\Stripe\Payment\Service;
+use PodPoint\Payments\Providers\Stripe\Token;
 use PodPoint\Payments\Tests\TestCase;
-use PodPoint\Payments\Token;
 
 class ServiceTest extends TestCase
 {
@@ -25,7 +25,7 @@ class ServiceTest extends TestCase
     }
 
     /**
-     * Tests if user can be created with payment method.
+     * Tests that a customer can be created with a payment method token.
      */
     public function testItCanCreateCustomerWithPaymentMethod()
     {
@@ -39,7 +39,7 @@ class ServiceTest extends TestCase
     }
 
     /**
-     * Tests backwards compatibility for old tokens.
+     * Tests that a customer can be created with a card token.
      */
     public function testItCanCreateCustomerWithCardToken()
     {

@@ -3,6 +3,8 @@
 namespace PodPoint\Payments\Providers\Stripe\Payment;
 
 use PodPoint\Payments\Payment;
+use PodPoint\Payments\Customer\Service as CustomerServiceInterface;
+use PodPoint\Payments\Refund\Service as RefundServiceInterface;
 use PodPoint\Payments\Providers\Stripe\Customer\Service as CustomerService;
 use PodPoint\Payments\Providers\Stripe\Refund\Service as RefundService;
 use PodPoint\Payments\Providers\Stripe\Payment\Exception as StripeException;
@@ -28,11 +30,11 @@ class Service implements ServiceInterface
      * Creates|confirms Payment.
      * Includes backwards compatibilty in case payment method constains card token instead of payment method token.
      *
-     * @param Token $token
+     * @param StripeToken $token
      * @param int $amount
+     * @param string $currency
      * @param string|null $description
      * @param array $metadata
-     * @param string $currency
      *
      * @return Payment
      *
@@ -41,9 +43,9 @@ class Service implements ServiceInterface
     public function create(
         Token $token,
         int $amount,
+        string $currency = 'GBP',
         string $description = null,
-        array $metadata = [],
-        string $currency = 'GBP'
+        array $metadata = []
     ): Payment {
         switch ($token->type) {
             case StripeToken::CUSTOMER:
@@ -64,6 +66,7 @@ class Service implements ServiceInterface
                         'description' => $description,
                         'metadata' => $metadata,
                     ]);
+
                     break;
                 }
 
@@ -77,11 +80,13 @@ class Service implements ServiceInterface
                     'description' => $description,
                     'metadata' => $metadata,
                 ]);
+
                 break;
             case StripeToken::PAYMENT_INTENT:
                 /** @var PaymentIntent $response */
                 $response = PaymentIntent::retrieve($token->value);
                 $response->confirm();
+
                 break;
         }
 
@@ -92,12 +97,22 @@ class Service implements ServiceInterface
         return new Payment($response->id, $response->currency, $response->amount, $response->created);
     }
 
-    public function customers(): CustomerService
+    /**
+     * Returns customer service.
+     *
+     * @return CustomerServiceInterface
+     */
+    public function customers(): CustomerServiceInterface
     {
         return new CustomerService();
     }
 
-    public function refunds(): RefundService
+    /**
+     * Returns refund service.
+     *
+     * @return RefundServiceInterface
+     */
+    public function refunds(): RefundServiceInterface
     {
         return new RefundService();
     }
