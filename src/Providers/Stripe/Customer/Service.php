@@ -26,7 +26,7 @@ class Service implements ServiceInterface
             'description' => $description,
         ];
 
-        if ($token AND $token->type !== StripeToken::UNDEFINED) {
+        if ($token->type !== StripeToken::UNDEFINED) {
             if ($token->type === StripeToken::PAYMENT_METHOD) {
                 $params['payment_method'] = $token->value;
             } else {

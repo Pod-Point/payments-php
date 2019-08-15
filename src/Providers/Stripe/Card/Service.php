@@ -3,7 +3,6 @@
 namespace PodPoint\Payments\Providers\Stripe\Card;
 
 use PodPoint\Payments\Card;
-use PodPoint\Payments\Customer;
 use PodPoint\Payments\Card\Service as ServiceInterface;
 use PodPoint\Payments\Exception;
 use PodPoint\Payments\Providers\Stripe\Card\Exception as StripeException;
@@ -25,7 +24,7 @@ class Service implements ServiceInterface
      */
     public function attach(Token $cardToken, Token $customerToken): Card
     {
-        if ($cardToken->type === StripeToken::PAYMENT_METHOD && $customerToken->type === StripeToken::CUSTOMER) {
+        if ($cardToken->type !== StripeToken::PAYMENT_METHOD && $customerToken->type !== StripeToken::CUSTOMER) {
             throw new \Exception('You need to provide a valid card Token and customer Token');
         }
 
@@ -59,7 +58,7 @@ class Service implements ServiceInterface
 
                 break;
             case StripeToken::CARD:
-                if ($customerToken->type === StripeToken::CUSTOMER) {
+                if ($customerToken->type !== StripeToken::CUSTOMER) {
                     throw new \Exception('You need to provide a valid customer Token.');
                 }
 
