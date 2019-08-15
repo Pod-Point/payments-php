@@ -33,7 +33,7 @@ class Service implements ServiceInterface
 
         $response = $paymentMethod->attach(['customer' => $customerToken->value]);
 
-        return new Card($response->payment_method, $paymentMethod->card->__toArray());
+        return new Card($response->payment_method,(array) $paymentMethod->card);
     }
 
     /**
@@ -103,7 +103,7 @@ class Service implements ServiceInterface
             throw new StripeException($response);
         }
 
-        return new Card($response->payment_method, $response->card->__toArray());
+        return new Card($response->payment_method, (array) $response->card);
     }
 
     /**
@@ -127,7 +127,7 @@ class Service implements ServiceInterface
 
                 if (isset($paymentMethods->data) && $paymentMethods->data) {
                     foreach ($paymentMethods->data as $paymentMethod) {
-                        $cards[] = new Card($paymentMethod->id, $paymentMethod->card->__toArray());
+                        $cards[] = new Card($paymentMethod->id, (array) $paymentMethod->card);
                     }
                 }
 
@@ -135,7 +135,7 @@ class Service implements ServiceInterface
 
                 if (isset($customer->cards->data) && $customer->cards->data) {
                     foreach ($customer->cards->data as $card) {
-                        $cards[] = new Card($card->id, $card->__toArray());
+                        $cards[] = new Card($card->id, (array) $card);
                     }
                 }
 
