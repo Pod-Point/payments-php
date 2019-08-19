@@ -12,9 +12,16 @@ class Token extends \PodPoint\Payments\Token
     const CHARGE = 'charge';
     const CARD = 'card';
 
+    /**
+     * Token constructor.
+     *
+     * @param string $value
+     * @param string|null $type
+     */
     public function __construct(string $value, ?string $type = null)
     {
         parent::__construct($value, $type);
+
         $this->type = $this->getTokenType($value);
     }
 
