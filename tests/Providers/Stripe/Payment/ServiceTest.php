@@ -50,9 +50,9 @@ class ServiceTest extends TestCase
         $customerToken = new Token('pm_card_visa');
 
         $customer = $this->service->customers()->create(
+            $customerToken,
             'john@pod-point.com',
-            'test',
-            $customerToken
+            'test'
         );
 
         $token = new Token($customer->uid);
@@ -76,10 +76,11 @@ class ServiceTest extends TestCase
         $customerToken = new Token('tok_visa');
 
         $customer = $this->service->customers()->create(
+            $customerToken,
             'john@pod-point.com',
-            'test',
-            $customerToken
+            'test'
         );
+
         $token = new Token($customer->uid);
 
         $this->assertEquals($token->type, StripeToken::CUSTOMER);
@@ -101,9 +102,9 @@ class ServiceTest extends TestCase
         $needAuthToken = new Token('pm_card_authenticationRequiredOnSetup');
 
         $customer = $this->service->customers()->create(
+            $needAuthToken,
             'john@pod-point.com',
-            'test',
-            $needAuthToken
+            'test'
         );
 
         $token = new Token($customer->uid);

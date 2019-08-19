@@ -31,6 +31,7 @@ class ServiceTest extends TestCase
     public function testCanCreateCustomer()
     {
         $customer = $this->service->customers()->create(
+            new Token('pm_card_visa'),
             'john@pod-point.com',
             'test'
         );
@@ -44,9 +45,9 @@ class ServiceTest extends TestCase
     public function testItCanCreateCustomerWithPaymentMethod()
     {
         $customer = $this->service->customers()->create(
+            new Token('pm_card_visa'),
             'john@pod-point.com',
-            'test',
-            new Token('pm_card_visa')
+            'test'
         );
 
         $this->assertInstanceOf(Customer::class, $customer);
@@ -60,7 +61,11 @@ class ServiceTest extends TestCase
         $email = 'john@pod-point.com';
         $description = "This is $email test decription";
 
-        $customer = $this->service->customers()->create($email, $description);
+        $customer = $this->service->customers()->create(
+            new Token('pm_card_visa'),
+            $email,
+            $description
+        );
 
         $token = new Token($customer->uid, StripeToken::CUSTOMER);
 
@@ -87,9 +92,9 @@ class ServiceTest extends TestCase
     public function testItCanCreateCustomerWithCardToken()
     {
         $customer = $this->service->customers()->create(
+            new Token('tok_visa'),
             'john@pod-point.com',
-            'test',
-            new Token('tok_visa')
+            'test'
         );
 
         $this->assertInstanceOf(Customer::class, $customer);
