@@ -25,15 +25,6 @@ abstract class Token
     public function __construct(string $value, ?string $type = null)
     {
         $this->value = $value;
-        $this->type = $this->getTokenType($type);
+        $this->type = $type;
     }
-
-    /**
-     * Returns StripeToken type base on incoming token.
-     *
-     * @param string|null $token
-     *
-     * @return string|null
-     */
-    protected abstract function getTokenType(?string $token): ?string;
 }

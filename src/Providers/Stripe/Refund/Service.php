@@ -7,9 +7,9 @@ use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 use PodPoint\Payments\Token;
 use Stripe\Charge;
 use Stripe\PaymentIntent;
-use PodPoint\Payments\Refund\Service as RefundInterface;
+use PodPoint\Payments\Refund\Service as RefundServiceInterface;
 
-class Service implements RefundInterface
+class Service implements RefundServiceInterface
 {
     /**
      * Tries to perform a refund using the Stripe SDK.
@@ -34,6 +34,7 @@ class Service implements RefundInterface
                     'reason' => $reason,
                     'metadata' => $metadata,
                 ]);
+
                 break;
             case StripeToken::CHARGE:
                 $refund = \Stripe\Refund::create([
@@ -42,6 +43,7 @@ class Service implements RefundInterface
                     'reason' => $reason,
                     'metadata' => $metadata,
                 ]);
+
                 break;
         }
 

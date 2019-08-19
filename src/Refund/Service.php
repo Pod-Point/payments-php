@@ -8,7 +8,7 @@ use PodPoint\Payments\Token;
 interface Service
 {
     /**
-     * Creates Refund.
+     * Performs a refund.
      *
      * @param Token $token
      * @param int $amount

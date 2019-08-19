@@ -56,7 +56,7 @@ class ServiceTest extends TestCase
 
         $customer = $this->service->customers()->create(
             $customerToken,
-            'john@pod-point.com',
+            'software@pod-point.com',
             'test'
         );
         $token = new Token($customer->uid);
@@ -81,7 +81,7 @@ class ServiceTest extends TestCase
 
         $customer = $this->service->customers()->create(
             $customerToken,
-            'john@pod-point.com',
+            'software@pod-point.com',
             'test'
         );
         $token = new Token($customer->uid);
@@ -106,7 +106,7 @@ class ServiceTest extends TestCase
 
         $customer = $this->service->customers()->create(
             $needAuthToken,
-            'john@pod-point.com',
+            'software@pod-point.com',
             'test'
         );
 

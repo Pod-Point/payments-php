@@ -27,8 +27,7 @@ class Service implements ServiceInterface
     }
 
     /**
-     * Creates|confirms Payment.
-     * Includes backwards compatibilty in case payment method constains card token instead of payment method token.
+     * Tries to make a payment using the Stripe SDK.
      *
      * @param Token $token
      * @param int $amount
@@ -57,7 +56,9 @@ class Service implements ServiceInterface
                 /** @var PaymentMethod $paymentMethod */
                 $paymentMethod = $paymentMethods->data[0];
 
-                if ($token->isCard($paymentMethod->id)) {
+                $paymentMethodToken = new StripeToken($paymentMethod->id);
+
+                if ($paymentMethodToken->type === StripeToken::CARD) {
                     /** @var Charge $response */
                     $response = Charge::create([
                         'customer' => $token->value,

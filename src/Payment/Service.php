@@ -3,7 +3,6 @@
 namespace PodPoint\Payments\Payment;
 
 use PodPoint\Payments\Payment;
-use PodPoint\Payments\Providers\Stripe\Payment\Exception;
 use PodPoint\Payments\Customer\Service as CustomerService;
 use PodPoint\Payments\Refund\Service as RefundService;
 use PodPoint\Payments\Token;
@@ -20,8 +19,6 @@ interface Service
      * @param array $metadata
      *
      * @return Payment
-     *
-     * @throws Exception
      */
     public function create(
         Token $token,

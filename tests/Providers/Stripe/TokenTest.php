@@ -27,14 +27,4 @@ class TokenTest extends TestCase
         $token = new Token('card_xxxyyy');
         $this->assertEquals($token->type, Token::CARD);
     }
-
-    /**
-     * Test it can identify card id.
-     */
-    public function testCanIdentifyCardToken()
-    {
-        $token = new Token('pm_some_xxx');
-
-        $this->assertEquals($token->isCard('card_ddsdsd'), true);
-    }
 }

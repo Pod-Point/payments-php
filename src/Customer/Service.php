@@ -8,7 +8,7 @@ use PodPoint\Payments\Token;
 interface Service
 {
     /**
-     * Creates new Customer.
+     * Creates a customer.
      *
      * @param Token $token
      * @param string $email

@@ -31,7 +31,7 @@ class ServiceTest extends TestCase
     {
         $customer = $this->service->customers()->create(
             new Token('pm_card_visa'),
-            'john@pod-point.com',
+            'software@pod-point.com',
             'test'
         );
 
@@ -45,7 +45,7 @@ class ServiceTest extends TestCase
     {
         $customer = $this->service->customers()->create(
             new Token('tok_visa'),
-            'john@pod-point.com',
+            'software@pod-point.com',
             'test'
         );
 

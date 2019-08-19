@@ -12,27 +12,39 @@ class Token extends \PodPoint\Payments\Token
     const CHARGE = 'charge';
     const CARD = 'card';
 
+    public function __construct(string $value, ?string $type = null)
+    {
+        parent::__construct($value, $type);
+        $this->type = $this->getTokenType($value);
+    }
+
     /**
-     * Returns StripeToken type base on incoming token.
+     * Determines and returns the token type from it's value.
      *
-     * @param string|null
+     * @param string
      *
      * @return string|null
      */
-    protected function getTokenType(?string $token): ?string
+    protected function getTokenType(string $token): ?string
     {
         switch (true) {
             case $this->startsWith('pi', $token):
+
                 return StripeToken::PAYMENT_INTENT;
             case $this->startsWith('pm', $token):
+
                 return StripeToken::PAYMENT_METHOD;
             case $this->startsWith('cus', $token):
+
                 return StripeToken::CUSTOMER;
             case $this->startsWith('ch', $token):
+
                 return StripeToken::CHARGE;
             case $this->startsWith('card', $token):
+
                 return StripeToken::CARD;
             default:
+
                 return null;
         }
     }
@@ -48,19 +60,7 @@ class Token extends \PodPoint\Payments\Token
     private function startsWith(string $needle, string $token = null): bool
     {
         $length = strlen($needle);
-        return (substr(trim($token ?? $this->value), 0, $length) === $needle);
-    }
 
-    /**
-     * Identifies card token.
-     *
-     * @param string $token
-     *
-     * @return bool
-     */
-    public function isCard(string $token): bool
-    {
-        $type = $this->getTokenType($token);
-        return $type === self::CARD;
+        return (substr(trim($token ?? $this->value), 0, $length) === $needle);
     }
 }
