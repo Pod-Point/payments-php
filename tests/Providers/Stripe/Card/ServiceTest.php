@@ -30,9 +30,10 @@ class ServiceTest extends TestCase
     public function testCreateSetupIntentThrowStripeException()
     {
         try {
-            $this->service->cards()->create();
+            $token = new Token('setup');
+            $this->service->cards()->create($token);
         } catch (StripeException $exception) {
-            $actual = $exception->getResponse()->client_secret;
+            $actual = $exception->getResponse()->value;
 
             $this->assertNotNull($actual);
         }
@@ -43,7 +44,7 @@ class ServiceTest extends TestCase
      */
     public function testCreateWithWrongTokenTypeThrowException()
     {
-        $token = new Token('wrong _value', 'wrong_type');
+        $token = new Token('card_123456789');
 
         $this->expectException(\Exception::class);
 
