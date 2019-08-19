@@ -2,7 +2,7 @@
 
 namespace PodPoint\Payments;
 
-class Token
+abstract class Token
 {
     /**
      * The token.
@@ -25,6 +25,15 @@ class Token
     public function __construct(string $value, ?string $type = null)
     {
         $this->value = $value;
-        $this->type = $type;
+        $this->type = $this->getTokenType($type);
     }
+
+    /**
+     * Returns StripeToken type base on incoming token.
+     *
+     * @param string|null $token
+     *
+     * @return string|null
+     */
+    protected abstract function getTokenType(?string $token): ?string;
 }

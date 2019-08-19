@@ -12,20 +12,14 @@ class Token extends \PodPoint\Payments\Token
     const CHARGE = 'charge';
     const CARD = 'card';
 
-    public function __construct(string $value)
-    {
-        parent::__construct($value);
-        $this->type = $this->getTokenType($value);
-    }
-
     /**
      * Returns StripeToken type base on incoming token.
      *
-     * @param $token
+     * @param string|null
      *
      * @return string|null
      */
-    private function getTokenType(string $token): ?string
+    protected function getTokenType(?string $token): ?string
     {
         switch (true) {
             case $this->startsWith('pi', $token):

@@ -30,7 +30,7 @@ class Service implements ServiceInterface
      * Creates|confirms Payment.
      * Includes backwards compatibilty in case payment method constains card token instead of payment method token.
      *
-     * @param StripeToken $token
+     * @param Token $token
      * @param int $amount
      * @param string $currency
      * @param string|null $description
