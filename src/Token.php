@@ -2,7 +2,7 @@
 
 namespace PodPoint\Payments;
 
-class Token
+abstract class Token
 {
     /**
      * The token.
@@ -20,9 +20,9 @@ class Token
 
     /**
      * @param string $value
-     * @param string $type
+     * @param string|null $type
      */
-    public function __construct(string $value, string $type)
+    public function __construct(string $value, ?string $type = null)
     {
         $this->value = $value;
         $this->type = $type;

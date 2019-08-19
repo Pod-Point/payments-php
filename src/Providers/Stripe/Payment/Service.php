@@ -3,13 +3,17 @@
 namespace PodPoint\Payments\Providers\Stripe\Payment;
 
 use PodPoint\Payments\Payment;
+use PodPoint\Payments\Customer\Service as CustomerServiceInterface;
+use PodPoint\Payments\Refund\Service as RefundServiceInterface;
+use PodPoint\Payments\Providers\Stripe\Customer\Service as CustomerService;
+use PodPoint\Payments\Providers\Stripe\Refund\Service as RefundService;
 use PodPoint\Payments\Providers\Stripe\Payment\Exception as StripeException;
 use PodPoint\Payments\Payment\Service as ServiceInterface;
 use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 use PodPoint\Payments\Token;
-use Stripe\Card;
 use Stripe\Charge;
 use Stripe\PaymentIntent;
+use Stripe\PaymentMethod;
 use Stripe\Stripe;
 
 class Service implements ServiceInterface
@@ -23,44 +27,66 @@ class Service implements ServiceInterface
     }
 
     /**
-     * Tries make a payment using the Stripe SDK.
+     * Tries to make a payment using the Stripe SDK.
      *
      * @param Token $token
      * @param int $amount
      * @param string $currency
+     * @param string|null $description
+     * @param array $metadata
      *
      * @return Payment
      *
-     * @throws StripeException
+     * @throws Exception
      */
-    public function create(Token $token, int $amount, string $currency = 'GBP'): Payment
-    {
+    public function create(
+        Token $token,
+        int $amount,
+        string $currency = 'GBP',
+        string $description = null,
+        array $metadata = []
+    ): Payment {
         switch ($token->type) {
-            case StripeToken::PAYMENT_INTENT:
-                /** @var PaymentIntent $response */
-                $response = PaymentIntent::retrieve($token->value);
-                $response->confirm();
+            case StripeToken::CUSTOMER:
+                $paymentMethods = PaymentMethod::all([
+                    'customer' => $token->value,
+                    'type' => 'card',
+                ]);
 
-                break;
-            case StripeToken::PAYMENT_METHOD:
-                /** @var PaymentIntent $response */
+                /** @var PaymentMethod $paymentMethod */
+                $paymentMethod = $paymentMethods->data[0];
+
+                $paymentMethodToken = new StripeToken($paymentMethod->id);
+
+                if ($paymentMethodToken->type === StripeToken::CARD) {
+                    /** @var Charge $response */
+                    $response = Charge::create([
+                        'customer' => $token->value,
+                        'amount' => $amount,
+                        'currency' => $currency,
+                        'description' => $description,
+                        'metadata' => $metadata,
+                    ]);
+
+                    break;
+                }
+
                 $response = PaymentIntent::create([
-                    'payment_method' => $token->value,
+                    'payment_method' => $paymentMethod->id,
+                    'customer' => $token->value,
                     'amount' => $amount,
                     'currency' => $currency,
                     'confirmation_method' => 'manual',
                     'confirm' => true,
+                    'description' => $description,
+                    'metadata' => $metadata,
                 ]);
 
                 break;
-            default:
-            case StripeToken::CUSTOMER:
-                /** @var Card $response */
-                $response = Charge::create([
-                    'customer' => $token->value,
-                    'amount' => $amount,
-                    'currency' => $currency,
-                ]);
+            case StripeToken::PAYMENT_INTENT:
+                /** @var PaymentIntent $response */
+                $response = PaymentIntent::retrieve($token->value);
+                $response->confirm();
 
                 break;
         }
@@ -70,5 +96,25 @@ class Service implements ServiceInterface
         }
 
         return new Payment($response->id, $response->currency, $response->amount, $response->created);
+    }
+
+    /**
+     * Returns customer service.
+     *
+     * @return CustomerServiceInterface
+     */
+    public function customers(): CustomerServiceInterface
+    {
+        return new CustomerService();
+    }
+
+    /**
+     * Returns refund service.
+     *
+     * @return RefundServiceInterface
+     */
+    public function refunds(): RefundServiceInterface
+    {
+        return new RefundService();
     }
 }
