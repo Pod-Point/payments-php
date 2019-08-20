@@ -40,7 +40,7 @@ class Service implements CustomerServiceInterface
 
                 break;
             default:
-                throw new \Exception ('Unexpected token type.');
+                throw new \Exception('Unexpected token type.');
         }
 
         $response = StripeCustomer::create($params);
