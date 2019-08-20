@@ -34,6 +34,7 @@ class Service implements RefundServiceInterface
                     'reason' => $reason,
                     'metadata' => $metadata,
                 ]);
+
                 break;
             case StripeToken::CHARGE:
                 $refund = \Stripe\Refund::create([
@@ -42,6 +43,7 @@ class Service implements RefundServiceInterface
                     'reason' => $reason,
                     'metadata' => $metadata,
                 ]);
+
                 break;
         }
 

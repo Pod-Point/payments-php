@@ -28,6 +28,7 @@ class Service implements ServiceInterface
             throw new \Exception('You need to provide a valid card Token and customer Token');
         }
 
+        /** @var PaymentMethod $paymentMethod */
         $paymentMethod = PaymentMethod::retrieve($cardToken->value);
 
         $response = $paymentMethod->attach(['customer' => $customerToken->value]);
@@ -50,15 +51,9 @@ class Service implements ServiceInterface
      */
     public function remove(Token $cardToken, $customerToken = null): void
     {
-        if (!in_array($cardToken->type, [
-            StripeToken::PAYMENT_METHOD,
-            StripeToken::CARD
-        ])) {
-            throw new \Exception('You need to provide a valid card/payment method Token.');
-        }
-
         switch ($cardToken->type) {
             case StripeToken::PAYMENT_METHOD:
+                /** @var PaymentMethod $paymentMethod */
                 $paymentMethod = PaymentMethod::retrieve($cardToken->value);
 
                 $paymentMethod->detach();
@@ -72,8 +67,9 @@ class Service implements ServiceInterface
                 StripeCustomer::deleteSource($customerToken->value, $cardToken->value);
 
                 break;
+            default:
+                throw new \Exception('You need to provide a valid card/payment method Token.');
         }
-
     }
 
     /**
@@ -116,6 +112,7 @@ class Service implements ServiceInterface
             throw new CardException($token);
         }
 
+        /** @var PaymentMethod $paymentMethod */
         $paymentMethod = PaymentMethod::retrieve($response->payment_method);
 
         return new Card(
@@ -160,6 +157,7 @@ class Service implements ServiceInterface
                     }
                 }
 
+                /** @var StripeCustomer $customer */
                 $customer = StripeCustomer::retrieve($token->value);
 
                 if (isset($customer->cards->data) && $customer->cards->data) {

@@ -67,6 +67,7 @@ class Service implements ServiceInterface
                     break;
                 }
 
+                /** @var PaymentIntent $response */
                 $response = PaymentIntent::create([
                     'payment_method' => $card->uid,
                     'customer' => $token->value,

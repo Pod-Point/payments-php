@@ -24,7 +24,7 @@ class Customer
      * @param string $email
      * @param string $description
      */
-    public function __construct(string $uid, string $email, string $description)
+    public function __construct(string $uid, string $email, string $description = '')
     {
         $this->uid = $uid;
         $this->email = $email;

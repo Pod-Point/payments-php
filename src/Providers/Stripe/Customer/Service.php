@@ -2,11 +2,11 @@
 
 namespace PodPoint\Payments\Providers\Stripe\Customer;
 
-use PodPoint\Payments\Customer\Service as CustomerServiceInterface;
 use PodPoint\Payments\Customer;
 use PodPoint\Payments\Token;
 use Stripe\Customer as StripeCustomer;
 use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
+use PodPoint\Payments\Customer\Service as CustomerServiceInterface;
 
 class Service implements CustomerServiceInterface
 {
@@ -43,6 +43,7 @@ class Service implements CustomerServiceInterface
                 throw new \Exception('Unexpected token type.');
         }
 
+        /** @var StripeCustomer $customer */
         $response = StripeCustomer::create($params);
 
         return new Customer($response->id, $response->email, $response->description);
@@ -58,6 +59,7 @@ class Service implements CustomerServiceInterface
     public function retrieve(Token $token): Customer
     {
         if ($token->type === StripeToken::CUSTOMER) {
+            /** @var StripeCustomer $customer */
             $response = StripeCustomer::retrieve($token->value);
         } else {
             throw new \Exception("You need to pass a Token with customer type.");
