@@ -3,11 +3,12 @@
 namespace PodPoint\Payments\Providers\Stripe\Payment;
 
 use PodPoint\Payments\Token;
+use PodPoint\Payments\ExceptionInterface;
 
-class Exception extends \Exception
+class Exception extends \Exception implements ExceptionInterface
 {
     /**
-     * The response from the Stripe API.
+     * The response from the API.
      *
      * @var Token
      */
@@ -19,17 +20,17 @@ class Exception extends \Exception
      */
     public function __construct($response, \Throwable $previous = null)
     {
-        parent::__construct('Failed to create payment due to Stripe API response', 1, $previous);
+        parent::__construct('Failed to create payment.', 1, $previous);
 
         $this->response = $response;
     }
 
     /**
-     * Returns the response from the Stripe API.
+     * Returns the response from the API.
      *
      * @return Token
      */
-    public function getResponse()
+    public function getResponse(): Token
     {
         return $this->response;
     }

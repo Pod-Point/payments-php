@@ -3,18 +3,19 @@
 namespace PodPoint\Payments\Providers\Stripe\Card;
 
 use PodPoint\Payments\Token;
+use PodPoint\Payments\ExceptionInterface;
 
-class Exception extends \Exception
+class Exception extends \Exception implements ExceptionInterface
 {
     /**
-     * The response from the Stripe API.
+     * The response from the API.
      *
      * @var Token
      */
     private $response;
 
     /**
-     * @param SetupIntent $response
+     * @param Token $response
      * @param \Throwable|null $previous
      */
     public function __construct($response, \Throwable $previous = null)
@@ -25,11 +26,11 @@ class Exception extends \Exception
     }
 
     /**
-     * Returns the response from the Stripe API.
+     * Returns the response from the API.
      *
-     * @return SetupIntent
+     * @return Token
      */
-    public function getResponse()
+    public function getResponse(): Token
     {
         return $this->response;
     }

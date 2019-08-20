@@ -37,7 +37,14 @@ class Token
     private function getTokenType(): string
     {
         if (strpos($this->value, 'secret') !== false) {
-            return StripeToken::SECRET;
+            switch (true) {
+                case $this->startsWith('pi'):
+                    return StripeToken::SECRET_PAYMENT_INTENT;
+                case $this->startsWith('seti'):
+                    return StripeToken::SECRET_SETUP_INTENT;
+                default:
+                    return StripeToken::UNDEFINED;
+            }
         }
 
         switch (true) {

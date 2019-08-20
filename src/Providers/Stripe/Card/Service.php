@@ -5,7 +5,7 @@ namespace PodPoint\Payments\Providers\Stripe\Card;
 use PodPoint\Payments\Card;
 use PodPoint\Payments\Card\Service as ServiceInterface;
 use PodPoint\Payments\Exception;
-use PodPoint\Payments\Providers\Stripe\Card\Exception as StripeException;
+use PodPoint\Payments\Providers\Stripe\Card\Exception as CardException;
 use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 use PodPoint\Payments\Token;
 use Stripe\SetupIntent;
@@ -48,7 +48,7 @@ class Service implements ServiceInterface
      * @param Token $cardToken
      * @param Token|null $customerToken
      */
-    public function remove(Token $cardToken, Token $customerToken = null): void
+    public function remove(Token $cardToken, $customerToken = null): void
     {
         if (!in_array($cardToken->type, [
             StripeToken::PAYMENT_METHOD,
@@ -85,7 +85,7 @@ class Service implements ServiceInterface
      * @return Card
      *
      * @throws Exception
-     * @throws StripeException
+     * @throws CardException
      */
     public function create(Token $token, array $params = []): Card
     {
@@ -113,7 +113,7 @@ class Service implements ServiceInterface
         if ($response->status !== SetupIntent::STATUS_SUCCEEDED) {
             $token = new Token($response->client_secret);
 
-            throw new StripeException($token);
+            throw new CardException($token);
         }
 
         $paymentMethod = PaymentMethod::retrieve($response->payment_method);

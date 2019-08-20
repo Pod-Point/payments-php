@@ -16,10 +16,10 @@ interface Service
      *
      * @param Token $token
      * @param int $amount
-     * @param string|null $description
-     * @param array $metadata
      * @param string $currency
      * @param array $metadata
+     * @param Token|null $customer
+     * @param string|null $description
      *
      * @return Payment
      *
@@ -28,9 +28,10 @@ interface Service
     public function create(
         Token $token,
         int $amount,
-        string $description = null,
+        string $currency = 'GBP',
         array $metadata = [],
-        string $currency = 'GBP'
+        $customer = null,
+        string $description = null
     ): Payment;
 
     /**

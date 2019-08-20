@@ -24,7 +24,7 @@ interface Service
      * @param Token $cardToken
      * @param Token|null $customerToken
      */
-    public function remove(Token $token, Token $customerToken = null): void;
+    public function remove(Token $token, $customerToken = null): void;
 
     /**
      * Tries create a card.

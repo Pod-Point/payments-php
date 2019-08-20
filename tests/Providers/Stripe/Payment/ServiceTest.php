@@ -7,7 +7,7 @@ use PodPoint\Payments\Providers\Stripe\Payment\Service;
 use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 use PodPoint\Payments\Tests\TestCase;
 use PodPoint\Payments\Token;
-use PodPoint\Payments\Providers\Stripe\Payment\Exception as StripeException;
+use PodPoint\Payments\Providers\Stripe\Payment\Exception as PaymentException;
 use PodPoint\Payments\Providers\Stripe\Customer\Service as CustomerService;
 use PodPoint\Payments\Providers\Stripe\Refund\Service as RefundService;
 
@@ -109,7 +109,7 @@ class ServiceTest extends TestCase
 
         $token = new Token($customer->uid);
 
-        $this->expectException(StripeException::class);
+        $this->expectException(PaymentException::class);
         $payment = $this->service->create($token, 100);
 
         $confirmedPayment = $this->service->create(new Token($payment->uid), 100);

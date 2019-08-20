@@ -6,7 +6,7 @@ use PodPoint\Payments\Payment;
 use PodPoint\Payments\Providers\Stripe\Card\Service as CardService;
 use PodPoint\Payments\Providers\Stripe\Customer\Service as CustomerService;
 use PodPoint\Payments\Providers\Stripe\Refund\Service as RefundService;
-use PodPoint\Payments\Providers\Stripe\Payment\Exception as StripeException;
+use PodPoint\Payments\Providers\Stripe\Payment\Exception as PaymentException;
 use PodPoint\Payments\Payment\Service as ServiceInterface;
 use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 use PodPoint\Payments\Token;
@@ -30,10 +30,10 @@ class Service implements ServiceInterface
      *
      * @param Token $token
      * @param int $amount
-     * @param string|null $description
-     * @param array $metadata
      * @param string $currency
-     * @param Token $customer
+     * @param array $metadata
+     * @param Token|null $customer
+     * @param string|null $description
      *
      * @return Payment
      *
@@ -42,10 +42,10 @@ class Service implements ServiceInterface
     public function create(
         Token $token,
         int $amount,
-        string $description = null,
-        array $metadata = [],
         string $currency = 'GBP',
-        $customer = null
+        array $metadata = [],
+        $customer = null,
+        string $description = null
     ): Payment {
         switch ($token->type) {
             case StripeToken::CUSTOMER:
@@ -120,12 +120,17 @@ class Service implements ServiceInterface
         if ($response instanceof PaymentIntent && $response->status !== PaymentIntent::STATUS_SUCCEEDED) {
             $token = new Token($response->client_secret);
 
-            throw new StripeException($token);
+            throw new PaymentException($token);
         }
 
         return new Payment($response->id, $response->amount, $response->currency, $response->created);
     }
 
+    /**
+     * Return the name of the provider.
+     *
+     * @return string
+     */
     public function getProviderName(): string
     {
         return 'stripe';
