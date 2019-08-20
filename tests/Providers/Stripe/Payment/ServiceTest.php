@@ -52,10 +52,10 @@ class ServiceTest extends TestCase
      */
     public function testCreatePaymentIntent()
     {
-        $customerToken = new Token('pm_card_visa');
+        $paymentMethodToken = new Token('pm_card_visa');
 
         $customer = $this->service->customers()->create(
-            $customerToken,
+            $paymentMethodToken,
             'software@pod-point.com',
             'test'
         );
@@ -131,11 +131,50 @@ class ServiceTest extends TestCase
         $token = new Token($customer->uid);
 
         $this->expectException(StripeException::class);
+
         $payment = $this->service->create($token, 100);
 
         $confirmedPayment = $this->service->create(new Token($payment->uid), 100);
 
         $this->assertInstanceOf(Payment::class, $confirmedPayment);
+    }
+
+    /**
+     * Tests that a payment can be created successfully with a payment method.
+     */
+    public function testCreatePaymentIntentWithPaymentMethod()
+    {
+        $paymentMethodToken = new Token('pm_card_visa');
+
+        $customer = $this->service->customers()->create(
+            $paymentMethodToken,
+            'software@pod-point.com',
+            'test'
+        );
+
+        $customerToken = new Token($customer->uid);
+
+        $payment = $this->service->create($paymentMethodToken, 100, 'GBP', [], $customerToken);
+
+        $this->assertInstanceOf(Payment::class, $payment);
+
+        $paymentIntent = new Token($payment->uid);
+
+        $this->assertEquals($paymentIntent->type, Token::PAYMENT_INTENT);
+    }
+
+    /**
+     * Tests throw exception if trying to create a payment with payment method and a bad customer token.
+     */
+    public function testThrowExceptionIfUsingPaymentMethodWithBadCustomerToken()
+    {
+        $paymentMethodToken = new Token('pm_card_visa');
+
+        $badCustomerToken = new Token('bad_token');
+
+        $this->expectException(\Exception::class);
+
+        $this->service->create($paymentMethodToken, 100, 'GBP', [], $badCustomerToken);
     }
 
     /**
