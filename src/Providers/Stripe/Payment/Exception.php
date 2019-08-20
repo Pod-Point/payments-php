@@ -20,7 +20,7 @@ class Exception extends \Exception implements ExceptionInterface
      */
     public function __construct($response, \Throwable $previous = null)
     {
-        parent::__construct('Failed to create payment.', 1, $previous);
+        parent::__construct('Failed to create payment due to Stripe API response.', 1, $previous);
 
         $this->response = $response;
     }

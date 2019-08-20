@@ -3,9 +3,9 @@
 namespace PodPoint\Payments\Tests\Providers\Stripe\Refund;
 
 use PodPoint\Payments\Providers\Stripe\Payment\Service;
+use PodPoint\Payments\Providers\Stripe\Token;
 use PodPoint\Payments\Refund;
 use PodPoint\Payments\Tests\TestCase;
-use PodPoint\Payments\Token;
 use Stripe\Charge;
 use Stripe\PaymentIntent;
 
@@ -27,7 +27,7 @@ class ServiceTest extends TestCase
     }
 
     /**
-     * Tests refund based on payment intent.
+     * Tests that a refund can be performed with a payment intent token.
      */
     public function testItCanRefundBasedOnPaymentIntent()
     {
@@ -49,7 +49,7 @@ class ServiceTest extends TestCase
     }
 
     /**
-     * Tests backwards compatibility for old tokens.
+     * Tests that a refund can be performed with a card token.
      */
     public function testItCanCreateCustomerWithCardToken()
     {

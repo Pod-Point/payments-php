@@ -7,11 +7,12 @@ use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 use PodPoint\Payments\Token;
 use Stripe\Charge;
 use Stripe\PaymentIntent;
+use PodPoint\Payments\Refund\Service as RefundServiceInterface;
 
-class Service
+class Service implements RefundServiceInterface
 {
     /**
-     * Creates Refund based on incoming token type chargeId|paymentIntentId.
+     * Tries to perform a refund using the Stripe SDK.
      *
      * @param Token $token
      * @param int $amount

@@ -9,7 +9,7 @@ use PodPoint\Payments\Token;
 interface Service
 {
     /**
-     * Tries attach a card to a customer.
+     * Attach a card to a customer.
      *
      * @param Token $cardToken
      * @param Token $customer
@@ -19,7 +19,7 @@ interface Service
     public function attach(Token $cardToken, Token $customerToken): Card;
 
     /**
-     * Tries remove a card.
+     * Remove a card.
      *
      * @param Token $cardToken
      * @param Token|null $customerToken
@@ -27,7 +27,7 @@ interface Service
     public function remove(Token $token, $customerToken = null): void;
 
     /**
-     * Tries create a card.
+     * Create a card.
      *
      * @param Token $token
      * @param array $params
@@ -37,7 +37,7 @@ interface Service
     public function create(Token $token, array $params = []): Card;
 
     /**
-     * Tries retrieve cards.
+     * Retrieve cards.
      *
      * @param Token $token
      *

@@ -2,16 +2,16 @@
 
 namespace PodPoint\Payments\Providers\Stripe\Customer;
 
-use PodPoint\Payments\Customer\Service as ServiceInterface;
+use PodPoint\Payments\Customer\Service as CustomerServiceInterface;
 use PodPoint\Payments\Customer;
 use PodPoint\Payments\Token;
 use Stripe\Customer as StripeCustomer;
 use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 
-class Service implements ServiceInterface
+class Service implements CustomerServiceInterface
 {
     /**
-     * Tries create a customer using the Stripe SDK can be initiated with attached method|card based on incoming token type.
+     * Creates a customer using the Stripe SDK.
      *
      * @param Token $token
      * @param string $email

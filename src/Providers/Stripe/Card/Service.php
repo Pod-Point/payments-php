@@ -111,7 +111,7 @@ class Service implements ServiceInterface
         }
 
         if ($response->status !== SetupIntent::STATUS_SUCCEEDED) {
-            $token = new Token($response->client_secret);
+            $token = new StripeToken($response->client_secret);
 
             throw new CardException($token);
         }

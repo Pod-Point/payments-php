@@ -8,7 +8,7 @@ use PodPoint\Payments\Token;
 interface Service
 {
     /**
-     * Tries create a Customer.
+     * Creates a customer.
      *
      * @param Token $token
      * @param string $email
@@ -19,7 +19,7 @@ interface Service
     public function create(Token $token, string $email, string $description): Customer;
 
     /**
-     * Tries retrieve a Customer
+     * Retrieve a Customer
      *
      * @param Token $token
      *

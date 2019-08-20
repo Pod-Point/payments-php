@@ -3,10 +3,13 @@
 namespace PodPoint\Payments\Providers\Stripe\Payment;
 
 use PodPoint\Payments\Payment;
+use PodPoint\Payments\Customer\Service as CustomerServiceInterface;
+use PodPoint\Payments\Refund\Service as RefundServiceInterface;
+use PodPoint\Payments\Card\Service as CardServiceInterface;
 use PodPoint\Payments\Providers\Stripe\Card\Service as CardService;
 use PodPoint\Payments\Providers\Stripe\Customer\Service as CustomerService;
 use PodPoint\Payments\Providers\Stripe\Refund\Service as RefundService;
-use PodPoint\Payments\Providers\Stripe\Payment\Exception as PaymentException;
+use PodPoint\Payments\Providers\Stripe\Payment\Exception as StripeException;
 use PodPoint\Payments\Payment\Service as ServiceInterface;
 use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 use PodPoint\Payments\Token;
@@ -25,8 +28,7 @@ class Service implements ServiceInterface
     }
 
     /**
-     * Creates|confirms Payment.
-     * Includes backwards compatibilty in case payment method constains card token instead of payment method token.
+     * Tries to make a payment using the Stripe SDK.
      *
      * @param Token $token
      * @param int $amount
@@ -118,9 +120,9 @@ class Service implements ServiceInterface
         }
 
         if ($response instanceof PaymentIntent && $response->status !== PaymentIntent::STATUS_SUCCEEDED) {
-            $token = new Token($response->client_secret);
+            $token = new StripeToken($response->client_secret);
 
-            throw new PaymentException($token);
+            throw new StripeException($token);
         }
 
         return new Payment($response->id, $response->amount, $response->currency, $response->created);
@@ -136,18 +138,33 @@ class Service implements ServiceInterface
         return 'stripe';
     }
 
-    public function customers(): CustomerService
+    /**
+     * Returns card service.
+     *
+     * @return CardServiceInterface
+     */
+    public function cards(): CardServiceInterface
+    {
+        return new CardService();
+    }
+
+    /**
+     * Returns customer service.
+     *
+     * @return CustomerServiceInterface
+     */
+    public function customers(): CustomerServiceInterface
     {
         return new CustomerService();
     }
 
-    public function refunds(): RefundService
+    /**
+     * Returns refund service.
+     *
+     * @return RefundServiceInterface
+     */
+    public function refunds(): RefundServiceInterface
     {
         return new RefundService();
-    }
-
-    public function cards(): CardService
-    {
-        return new CardService();
     }
 }

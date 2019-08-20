@@ -4,7 +4,7 @@ namespace PodPoint\Payments;
 
 class Refund
 {
-    /**@var string */
+    /** @var string */
     public $id;
 
     /**

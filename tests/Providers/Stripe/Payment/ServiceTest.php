@@ -4,10 +4,9 @@ namespace PodPoint\Payments\Tests\Providers\Stripe\Payment;
 
 use PodPoint\Payments\Payment;
 use PodPoint\Payments\Providers\Stripe\Payment\Service;
-use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
+use PodPoint\Payments\Providers\Stripe\Token;
 use PodPoint\Payments\Tests\TestCase;
-use PodPoint\Payments\Token;
-use PodPoint\Payments\Providers\Stripe\Payment\Exception as PaymentException;
+use PodPoint\Payments\Providers\Stripe\Payment\Exception as StripeException;
 use PodPoint\Payments\Providers\Stripe\Customer\Service as CustomerService;
 use PodPoint\Payments\Providers\Stripe\Refund\Service as RefundService;
 
@@ -28,6 +27,9 @@ class ServiceTest extends TestCase
         $this->service = new Service(getenv('STRIPE_KEY'));
     }
 
+    /**
+     * Tests that customer service can be returned.
+     */
     public function testCanReturnCustomerService()
     {
         $service = $this->service->customers();
@@ -35,6 +37,9 @@ class ServiceTest extends TestCase
         $this->assertInstanceOf(CustomerService::class, $service);
     }
 
+    /**
+     * Tests that refund service can be returned.
+     */
     public function testCanReturnRefundService()
     {
         $service = $this->service->refunds();
@@ -51,13 +56,12 @@ class ServiceTest extends TestCase
 
         $customer = $this->service->customers()->create(
             $customerToken,
-            'john@pod-point.com',
+            'software@pod-point.com',
             'test'
         );
-
         $token = new Token($customer->uid);
 
-        $this->assertEquals($token->type, StripeToken::CUSTOMER);
+        $this->assertEquals($token->type, Token::CUSTOMER);
 
         $payment = $this->service->create($token, 100);
 
@@ -65,7 +69,7 @@ class ServiceTest extends TestCase
 
         $paymentIntent = new Token($payment->uid);
 
-        $this->assertEquals($paymentIntent->type, StripeToken::PAYMENT_INTENT);
+        $this->assertEquals($paymentIntent->type, Token::PAYMENT_INTENT);
     }
 
     /**
@@ -77,13 +81,12 @@ class ServiceTest extends TestCase
 
         $customer = $this->service->customers()->create(
             $customerToken,
-            'john@pod-point.com',
+            'software@pod-point.com',
             'test'
         );
-
         $token = new Token($customer->uid);
 
-        $this->assertEquals($token->type, StripeToken::CUSTOMER);
+        $this->assertEquals($token->type, Token::CUSTOMER);
 
         $payment = $this->service->create($token, 100);
 
@@ -91,7 +94,7 @@ class ServiceTest extends TestCase
 
         $charge = new Token($payment->uid);
 
-        $this->assertEquals($charge->type, StripeToken::CHARGE);
+        $this->assertEquals($charge->type, Token::CHARGE);
     }
 
     /**
@@ -103,13 +106,13 @@ class ServiceTest extends TestCase
 
         $customer = $this->service->customers()->create(
             $needAuthToken,
-            'john@pod-point.com',
+            'software@pod-point.com',
             'test'
         );
 
         $token = new Token($customer->uid);
 
-        $this->expectException(PaymentException::class);
+        $this->expectException(StripeException::class);
         $payment = $this->service->create($token, 100);
 
         $confirmedPayment = $this->service->create(new Token($payment->uid), 100);

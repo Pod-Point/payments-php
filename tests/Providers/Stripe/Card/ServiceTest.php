@@ -2,7 +2,7 @@
 
 namespace PodPoint\Payments\Tests\Providers\Stripe\Card;
 
-use PodPoint\Payments\Token;
+use PodPoint\Payments\Providers\Stripe\Token;
 use PodPoint\Payments\Providers\Stripe\Card\Exception as StripeException;
 use PodPoint\Payments\Providers\Stripe\Payment\Service;
 use PodPoint\Payments\Tests\TestCase;
