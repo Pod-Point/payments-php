@@ -3,6 +3,7 @@
 namespace PodPoint\Payments\Tests\Providers\Stripe\Customer;
 
 use PodPoint\Payments\Customer;
+use PodPoint\Payments\Providers\Stripe\Payment\Exception;
 use PodPoint\Payments\Providers\Stripe\Payment\Service;
 use PodPoint\Payments\Providers\Stripe\Token;
 use PodPoint\Payments\Tests\TestCase;
@@ -92,6 +93,22 @@ class ServiceTest extends TestCase
     {
         $customer = $this->service->customers()->create(
             new Token('tok_visa'),
+            'software@pod-point.com',
+            'test'
+        );
+
+        $this->assertInstanceOf(Customer::class, $customer);
+    }
+
+    /**
+     * Tests throw exception if trying to create customer with a bad token.
+     */
+    public function testThrowExceptionIfBadTokenType()
+    {
+        $this->expectException(\Exception::class);
+
+        $customer = $this->service->customers()->create(
+            new Token('bad_token'),
             'software@pod-point.com',
             'test'
         );
