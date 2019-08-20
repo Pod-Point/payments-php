@@ -31,16 +31,12 @@ class Service implements CustomerServiceInterface
                 $params['payment_method'] = $token->value;
 
                 break;
-            case StripeToken::CARD:
-                $params['card'] = $token->value;
-
-                break;
             case StripeToken::TOKEN:
                 $params['source'] = $token->value;
 
                 break;
             default:
-                throw new \Exception('Unexpected token type.');
+                throw new \Exception('Unexpected token type (accepted payment method/token).');
         }
 
         /** @var StripeCustomer $customer */

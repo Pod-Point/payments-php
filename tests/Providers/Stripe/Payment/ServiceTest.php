@@ -59,6 +59,7 @@ class ServiceTest extends TestCase
             'software@pod-point.com',
             'test'
         );
+
         $token = new Token($customer->uid);
 
         $this->assertEquals($token->type, Token::CUSTOMER);
@@ -73,22 +74,39 @@ class ServiceTest extends TestCase
     }
 
     /**
-     * Tests that a payment can be created successfully from old token.
+     * Tests that a payment can be created successfully from old token linked to a customer.
      */
     public function testCreateChargeForBackwardCompatibility()
     {
-        $customerToken = new Token('tok_visa');
+        $sourceToken = new Token('tok_visa');
 
         $customer = $this->service->customers()->create(
-            $customerToken,
+            $sourceToken,
             'software@pod-point.com',
             'test'
         );
+
         $token = new Token($customer->uid);
 
         $this->assertEquals($token->type, Token::CUSTOMER);
 
         $payment = $this->service->create($token, 100);
+
+        $this->assertInstanceOf(Payment::class, $payment);
+
+        $charge = new Token($payment->uid);
+
+        $this->assertEquals($charge->type, Token::CHARGE);
+    }
+
+    /**
+     * Tests that a payment can be created successfully from old token.
+     */
+    public function testCreateChargeFromToken()
+    {
+        $sourceToken = new Token('tok_visa');
+
+        $payment = $this->service->create($sourceToken, 100);
 
         $this->assertInstanceOf(Payment::class, $payment);
 
@@ -118,5 +136,15 @@ class ServiceTest extends TestCase
         $confirmedPayment = $this->service->create(new Token($payment->uid), 100);
 
         $this->assertInstanceOf(Payment::class, $confirmedPayment);
+    }
+
+    /**
+     * Tests get provider name.
+     */
+    public function testGetProviderName()
+    {
+        $providername = $this->service->getProviderName();
+
+        $this->assertEquals('stripe', $providername);
     }
 }
