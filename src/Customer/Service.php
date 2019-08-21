@@ -19,11 +19,11 @@ interface Service
     public function create(Token $token, string $email, string $description): Customer;
 
     /**
-     * Retrieve a Customer
+     * Retrieve a Customer.
      *
      * @param Token $token
      *
      * @return Customer
      */
-    public function retrieve(Token $token): Customer;
+    public function find(Token $token): Customer;
 }

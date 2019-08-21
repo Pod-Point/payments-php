@@ -11,9 +11,10 @@ class Token extends \PodPoint\Payments\Token
     const PAYMENT_METHOD = 'payment_method';
     const SETUP_INTENT = 'setup_intent_id';
     const SECRET_SETUP_INTENT = 'secret_setup_intent';
+    const SETUP_CARD_CREATION = 'setup_card_creation';
     const CARD = 'card';
     const CHARGE = 'charge';
-    const UNDEFINED = 'undefined';
+    const SETUP = 'setup';
 
     /**
      * Token constructor.
@@ -35,36 +36,48 @@ class Token extends \PodPoint\Payments\Token
      *
      * @return string|null
      */
-    protected function getTokenType(string $token): ?string
+    protected function getTokenType(): ?string
     {
         if (strpos($this->value, 'secret') !== false) {
             switch (true) {
                 case $this->startsWith('pi'):
+
                     return self::SECRET_PAYMENT_INTENT;
                 case $this->startsWith('seti'):
+
                     return self::SECRET_SETUP_INTENT;
                 default:
-                    return self::UNDEFINED;
+                    throw new \Exception('Unknown type of secret token');
             }
         }
 
         switch (true) {
             case $this->startsWith('pi'):
+
                 return self::PAYMENT_INTENT;
             case $this->startsWith('pm'):
+
                 return self::PAYMENT_METHOD;
             case $this->startsWith('card'):
+
                 return self::CARD;
             case $this->startsWith('cus'):
+
                 return self::CUSTOMER;
             case $this->startsWith('ch'):
+
                 return self::CHARGE;
             case $this->startsWith('seti'):
+
                 return self::SETUP_INTENT;
             case $this->startsWith('tok'):
+
                 return self::TOKEN;
+            case $this->startsWith('setup'):
+
+                return self::SETUP_CARD_CREATION;
             default:
-                return self::UNDEFINED;
+                throw new \Exception('Unknown type of token');
         }
     }
 
@@ -81,17 +94,5 @@ class Token extends \PodPoint\Payments\Token
         $length = strlen($needle);
 
         return (substr(trim($token ?? $this->value), 0, $length) === $needle);
-    }
-
-    /**
-     * Identifies card token.
-     *
-     * @param string $token
-     *
-     * @return bool
-     */
-    public function isCard(string $token): bool
-    {
-        return $this->startsWith('card', $token);
     }
 }

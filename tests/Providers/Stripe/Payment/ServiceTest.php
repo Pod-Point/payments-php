@@ -154,7 +154,7 @@ class ServiceTest extends TestCase
 
         $customerToken = new Token($customer->uid);
 
-        $payment = $this->service->create($paymentMethodToken, 100, 'GBP', [], $customerToken);
+        $payment = $this->service->create($paymentMethodToken, 100, 'GBP', null, [], $customerToken);
 
         $this->assertInstanceOf(Payment::class, $payment);
 
@@ -170,11 +170,11 @@ class ServiceTest extends TestCase
     {
         $paymentMethodToken = new Token('pm_card_visa');
 
-        $badCustomerToken = new Token('bad_token');
+        $badCustomerToken = new Token('pm_card_visa');
 
         $this->expectException(\Exception::class);
 
-        $this->service->create($paymentMethodToken, 100, 'GBP', [], $badCustomerToken);
+        $this->service->create($paymentMethodToken, 100, 'GBP', null, [], $badCustomerToken);
     }
 
     /**

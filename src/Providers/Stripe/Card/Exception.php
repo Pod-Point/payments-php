@@ -18,7 +18,7 @@ class Exception extends \Exception implements ExceptionInterface
      * @param Token $response
      * @param \Throwable|null $previous
      */
-    public function __construct($response, \Throwable $previous = null)
+    public function __construct(Token $response, \Throwable $previous = null)
     {
         parent::__construct('Failed to create a new card due to Stripe API response', 1, $previous);
 

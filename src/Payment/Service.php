@@ -16,9 +16,9 @@ interface Service
      * @param Token $token
      * @param int $amount
      * @param string $currency
+     * @param string|null $description
      * @param array $metadata
      * @param Token|null $customer
-     * @param string|null $description
      *
      * @return Payment
      */
@@ -26,22 +26,28 @@ interface Service
         Token $token,
         int $amount,
         string $currency = 'GBP',
+        string $description = null,
         array $metadata = [],
-        $customer = null,
-        string $description = null
+        Token $customer = null
     ): Payment;
 
     /**
+     * Returns card service.
+     *
      * @return CardService
      */
     public function cards(): CardService;
 
     /**
+     * Returns customer service.
+     *
      * @return CustomerService
      */
     public function customers(): CustomerService;
 
     /**
+     * Returns refund service.
+     *
      * @return RefundService
      */
     public function refunds(): RefundService;

@@ -5,7 +5,7 @@ namespace PodPoint\Payments;
 class Card
 {
     /**
-     * The uid or unique identifier for a payment method.
+     * The uid or unique identifier of the card.
      *
      * @var string
      */

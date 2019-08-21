@@ -52,7 +52,7 @@ class Service implements CustomerServiceInterface
      *
      * @return Customer
      */
-    public function retrieve(Token $token): Customer
+    public function find(Token $token): Customer
     {
         if ($token->type === StripeToken::CUSTOMER) {
             /** @var StripeCustomer $customer */

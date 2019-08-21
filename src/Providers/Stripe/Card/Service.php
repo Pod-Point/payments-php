@@ -4,7 +4,6 @@ namespace PodPoint\Payments\Providers\Stripe\Card;
 
 use PodPoint\Payments\Card;
 use PodPoint\Payments\Card\Service as ServiceInterface;
-use PodPoint\Payments\Exception;
 use PodPoint\Payments\Providers\Stripe\Card\Exception as CardException;
 use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 use PodPoint\Payments\Token;
@@ -49,7 +48,7 @@ class Service implements ServiceInterface
      * @param Token $cardToken
      * @param Token|null $customerToken
      */
-    public function remove(Token $cardToken, $customerToken = null): void
+    public function delete(Token $cardToken, Token $customerToken = null): void
     {
         switch ($cardToken->type) {
             case StripeToken::PAYMENT_METHOD:
@@ -60,15 +59,11 @@ class Service implements ServiceInterface
 
                 break;
             case StripeToken::CARD:
-                if ($customerToken->type !== StripeToken::CUSTOMER) {
-                    throw new \Exception('You need to provide a valid customer Token.');
-                }
-
                 StripeCustomer::deleteSource($customerToken->value, $cardToken->value);
 
                 break;
             default:
-                throw new \Exception('You need to provide a valid card/payment method Token.');
+                //
         }
     }
 
@@ -86,7 +81,7 @@ class Service implements ServiceInterface
     public function create(Token $token, array $params = []): Card
     {
         switch ($token->type) {
-            case StripeToken::UNDEFINED:
+            case StripeToken::SETUP_CARD_CREATION:
                 $params = array_merge(
                     [
                         'usage' => 'on_session',
@@ -130,9 +125,9 @@ class Service implements ServiceInterface
      *
      * @param Token $token
      *
-     * @return array[Card]
+     * @return Card[]
      */
-    public function index(Token $token): array
+    public function get(Token $token): array
     {
         $cards = [];
 
@@ -175,7 +170,7 @@ class Service implements ServiceInterface
 
                 break;
             default:
-                throw new \Exception("You need to pass a customer Token.");
+                throw new \Exception('You need to pass a customer Token.');
 
                 break;
         }

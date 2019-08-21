@@ -45,16 +45,18 @@ class Service implements ServiceInterface
         Token $token,
         int $amount,
         string $currency = 'GBP',
+        string $description = null,
         array $metadata = [],
-        $customer = null,
-        string $description = null
+        Token $customer = null
     ): Payment {
         switch ($token->type) {
             case StripeToken::CUSTOMER:
-                $cards = $this->cards()->index($token);
+                $cards = $this->cards()->get($token);
                 $card = $cards[0];
 
-                if ($token->isCard($card->uid)) {
+                $paymentMethodToken = new StripeToken($card->uid);
+
+                if ($paymentMethodToken->type === StripeToken::CARD) {
                     /** @var Charge $response */
                     $response = Charge::create([
                         'customer' => $token->value,
@@ -111,7 +113,7 @@ class Service implements ServiceInterface
                     'currency' => $currency,
                     'confirmation_method' => 'manual',
                     'confirm' => true,
-                    "payment_method_types" => ["card"],
+                    'payment_method_types' => ['card'],
                     'description' => $description,
                     'metadata' => $metadata,
                     'use_stripe_sdk' => true,

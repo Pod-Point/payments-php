@@ -69,7 +69,7 @@ class ServiceTest extends TestCase
 
         $token = new Token($customer->uid);
 
-        $customer = $this->service->customers()->retrieve($token);
+        $customer = $this->service->customers()->find($token);
 
         $this->assertInstanceOf(Customer::class, $customer);
     }
@@ -79,11 +79,11 @@ class ServiceTest extends TestCase
      */
     public function testRetrieveCustomerWithWrongTokenTypeThrowException()
     {
-        $token = new Token('wrong _value', 'wrong_type');
+        $paymentMethodToken = new Token('pm_card_visa');
 
         $this->expectException(\Exception::class);
 
-        $this->service->customers()->retrieve($token);
+        $this->service->customers()->find($paymentMethodToken);
     }
 
     /**
@@ -108,7 +108,7 @@ class ServiceTest extends TestCase
         $this->expectException(\Exception::class);
 
         $customer = $this->service->customers()->create(
-            new Token('bad_token'),
+            new Token('tok_token'),
             'software@pod-point.com',
             'test'
         );

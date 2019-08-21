@@ -39,10 +39,13 @@ class TokenTest extends TestCase
         $token = new Token('seti_some_xxx');
         $this->assertEquals($token->type, Token::SETUP_INTENT);
 
-        $token = new Token('some_xxx_secret_xxx');
-        $this->assertEquals($token->type, Token::UNDEFINED);
-
         $token = new Token('setup');
-        $this->assertEquals($token->type, Token::UNDEFINED);
+        $this->assertEquals($token->type, Token::SETUP_CARD_CREATION);
+
+        $this->expectException(\Exception::class);
+        $token = new Token('bad_token');
+
+        $this->expectException(\Exception::class);
+        $token = new Token('bad_secret_xxx');
     }
 }

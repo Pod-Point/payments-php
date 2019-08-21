@@ -24,7 +24,7 @@ interface Service
      * @param Token $cardToken
      * @param Token|null $customerToken
      */
-    public function remove(Token $token, $customerToken = null): void;
+    public function delete(Token $token, Token $customerToken = null): void;
 
     /**
      * Create a card.
@@ -41,7 +41,7 @@ interface Service
      *
      * @param Token $token
      *
-     * @return array[Card]
+     * @return Card[]
      */
-    public function index(Token $token): array;
+    public function get(Token $token): array;
 }
