@@ -36,7 +36,7 @@ class Service implements CustomerServiceInterface
 
                 break;
             default:
-                throw new \Exception('Unexpected token type (accepted payment method/token).');
+                throw new \Exception('You need to either pass a token with payment method or token type.');
         }
 
         /** @var StripeCustomer $customer */

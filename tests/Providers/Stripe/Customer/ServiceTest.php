@@ -75,9 +75,9 @@ class ServiceTest extends TestCase
     }
 
     /**
-     * Tests that an exception is thrown when sending wrong token type.
+     * Tests that an exception is thrown when trying to retrieve a customer with a wrong token type.
      */
-    public function testRetrieveWithWrongTokenTypeThrowException()
+    public function testRetrieveCustomerWithWrongTokenTypeThrowException()
     {
         $token = new Token('wrong _value', 'wrong_type');
 

@@ -164,9 +164,9 @@ class ServiceTest extends TestCase
     }
 
     /**
-     * Tests throw exception if trying to create a payment with payment method and a bad customer token.
+     * Tests that creating a payment with a bad customer token throw exception.
      */
-    public function testThrowExceptionIfUsingPaymentMethodWithBadCustomerToken()
+    public function testCreatingPaymentWithBadCustomerTokenThrowException()
     {
         $paymentMethodToken = new Token('pm_card_visa');
 
