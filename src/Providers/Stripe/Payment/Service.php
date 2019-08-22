@@ -33,9 +33,9 @@ class Service implements ServiceInterface
      * @param Token $token
      * @param int $amount
      * @param string $currency
+     * @param string|null $description
      * @param array $metadata
      * @param Token|null $customer
-     * @param string|null $description
      *
      * @return Payment
      *
