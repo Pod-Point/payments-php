@@ -19,7 +19,16 @@ interface Service
     /**
      * Remove a card.
      *
-     * @param Token $token
+     * @param Card $card
      */
-    public function delete(Token $token): void;
+    public function delete(Card $card): void;
+
+    /**
+     * Retrieve a card.
+     *
+     * @param Token $token
+     *
+     * @return Card
+     */
+    public function find(Token $token): Card;
 }

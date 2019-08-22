@@ -32,11 +32,11 @@ interface Service
      * Add a card to a customer.
      *
      * @param Customer $customer
-     * @param Token $cardToken
+     * @param Card $card
      *
      * @return Card
      */
-    public function addCard(Customer $customer, Token $cardToken): Card;
+    public function addCard(Customer $customer, Card $card): Card;
 
     /**
      * Remove a card from a customer.

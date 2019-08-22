@@ -50,9 +50,9 @@ class ServiceTest extends TestCase
             'test'
         );
 
-        $cardToken = new Token('pm_card_visa');
+        $card = $this->service->cards()->find(new Token('pm_card_visa'));
 
-        $card = $this->service->customers()->addCard($customer, $cardToken);
+        $card = $this->service->customers()->addCard($customer, $card);
 
         $this->assertInstanceOf(Card::class, $card);
     }

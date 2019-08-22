@@ -65,15 +65,15 @@ class Service implements CustomerServiceInterface
     /**
      * Tries add a card to a customer using the Stripe SDK.
      *
-     * @param Token $cardToken
-     * @param Token $customerToken
+     * @param Customer $customer
+     * @param Card $card
      *
      * @return Card
      */
-    public function addCard(Customer $customer, Token $cardToken): Card
+    public function addCard(Customer $customer, Card $card): Card
     {
         /** @var PaymentMethod $paymentMethod */
-        $paymentMethod = PaymentMethod::retrieve($cardToken->value);
+        $paymentMethod = PaymentMethod::retrieve($card->uid);
 
         $response = $paymentMethod->attach(['customer' => $customer->uid]);
 

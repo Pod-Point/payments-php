@@ -58,12 +58,33 @@ class Service implements ServiceInterface
     /**
      * Tries remove a card using the Stripe SDK.
      *
-     * @param Token $token
+     * @param Card $card
      */
-    public function delete(Token $token): void
+    public function delete(Card $card): void
+    {
+        $paymentMethod = PaymentMethod::retrieve($card->uid);
+
+        $paymentMethod->detach();
+    }
+
+    /**
+     * Tries retrieve a card using the Stripe SDK.
+     *
+     * @param Token $token
+     *
+     * @return Card
+     */
+    public function find(Token $token): Card
     {
         $paymentMethod = PaymentMethod::retrieve($token->value);
 
-        $paymentMethod->detach();
+        return new Card(
+            $paymentMethod->id,
+            $paymentMethod->card->last4,
+            $paymentMethod->card->brand,
+            $paymentMethod->card->funding,
+            $paymentMethod->card->exp_month,
+            $paymentMethod->card->exp_year
+        );
     }
 }
