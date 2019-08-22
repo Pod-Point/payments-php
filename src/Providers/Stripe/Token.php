@@ -40,41 +40,30 @@ class Token extends \PodPoint\Payments\Token
         if (strpos($this->value, 'secret') !== false) {
             switch (true) {
                 case $this->startsWith('pi'):
-
                     return self::SECRET_PAYMENT_INTENT;
                 case $this->startsWith('seti'):
-
                     return self::SECRET_SETUP_INTENT;
                 default:
-
                     return null;
             }
         }
 
         switch (true) {
             case $this->startsWith('pi'):
-
                 return self::PAYMENT_INTENT;
             case $this->startsWith('pm'):
-
                 return self::PAYMENT_METHOD;
             case $this->startsWith('card'):
-
                 return self::CARD;
             case $this->startsWith('cus'):
-
                 return self::CUSTOMER;
             case $this->startsWith('ch'):
-
                 return self::CHARGE;
             case $this->startsWith('seti'):
-
                 return self::SETUP_INTENT;
             case $this->startsWith('tok'):
-
                 return self::TOKEN;
             default:
-
                 return null;
         }
     }
