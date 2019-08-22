@@ -51,7 +51,9 @@ class Service implements ServiceInterface
     ): Payment {
         switch ($token->type) {
             case StripeToken::CUSTOMER:
-                $cards = $this->cards()->get($token);
+                $customer = $this->customers()->find($token);
+
+                $cards = $this->customers()->getCards($customer);
                 $card = $cards[0];
 
                 $paymentMethodToken = new StripeToken($card->uid);
@@ -59,7 +61,7 @@ class Service implements ServiceInterface
                 if ($paymentMethodToken->type === StripeToken::CARD) {
                     /** @var Charge $response */
                     $response = Charge::create([
-                        'customer' => $token->value,
+                        'customer' => $customer->uid,
                         'amount' => $amount,
                         'currency' => $currency,
                         'description' => $description,
@@ -72,7 +74,7 @@ class Service implements ServiceInterface
                 /** @var PaymentIntent $response */
                 $response = PaymentIntent::create([
                     'payment_method' => $card->uid,
-                    'customer' => $token->value,
+                    'customer' => $customer->uid,
                     'amount' => $amount,
                     'currency' => $currency,
                     'confirmation_method' => 'manual',
@@ -120,6 +122,8 @@ class Service implements ServiceInterface
                 ]);
 
                 break;
+            default:
+                //
         }
 
         if ($response instanceof PaymentIntent && $response->status !== PaymentIntent::STATUS_SUCCEEDED) {
@@ -129,16 +133,6 @@ class Service implements ServiceInterface
         }
 
         return new Payment($response->id, $response->amount, $response->currency, $response->created);
-    }
-
-    /**
-     * Return the name of the provider.
-     *
-     * @return string
-     */
-    public function getProviderName(): string
-    {
-        return 'stripe';
     }
 
     /**

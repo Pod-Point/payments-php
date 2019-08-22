@@ -2,8 +2,8 @@
 
 namespace PodPoint\Payments\Tests\Providers\Stripe\Card;
 
+use PodPoint\Payments\Providers\Stripe\Card\Exception;
 use PodPoint\Payments\Providers\Stripe\Token;
-use PodPoint\Payments\Providers\Stripe\Card\Exception as StripeException;
 use PodPoint\Payments\Providers\Stripe\Payment\Service;
 use PodPoint\Payments\Tests\TestCase;
 
@@ -25,29 +25,14 @@ class ServiceTest extends TestCase
     }
 
     /**
-     * Tests that a Stripe exception is thrown with a client secret in its response.
+     * Test card can be setup.
      */
-    public function testCreateSetupIntentThrowStripeException()
+    public function testSetupCard()
     {
         try {
-            $token = new Token('setup');
-            $this->service->cards()->create($token);
-        } catch (StripeException $exception) {
-            $actual = $exception->getResponse()->value;
-
-            $this->assertNotNull($actual);
+            $this->service->cards()->create();
+        } catch (Exception $e) {
+            $this->assertEquals(Token::SECRET_SETUP_INTENT, $e->getResponse()->type);
         }
-    }
-
-    /**
-     * Tests that an exception is thrown when sending wrong token type.
-     */
-    public function testCreateWithWrongTokenTypeThrowException()
-    {
-        $token = new Token('card_123456789');
-
-        $this->expectException(\Exception::class);
-
-        $this->service->cards()->create($token);
     }
 }

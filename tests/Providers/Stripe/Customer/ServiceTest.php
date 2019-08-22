@@ -3,7 +3,7 @@
 namespace PodPoint\Payments\Tests\Providers\Stripe\Customer;
 
 use PodPoint\Payments\Customer;
-use PodPoint\Payments\Providers\Stripe\Payment\Exception;
+use PodPoint\Payments\Card;
 use PodPoint\Payments\Providers\Stripe\Payment\Service;
 use PodPoint\Payments\Providers\Stripe\Token;
 use PodPoint\Payments\Tests\TestCase;
@@ -40,9 +40,9 @@ class ServiceTest extends TestCase
     }
 
     /**
-     * Tests that a customer can be created with a payment method token.
+     * Tests can add card to customer.
      */
-    public function testItCanCreateCustomerWithPaymentMethod()
+    public function testCanAddCard()
     {
         $customer = $this->service->customers()->create(
             new Token('pm_card_visa'),
@@ -50,7 +50,11 @@ class ServiceTest extends TestCase
             'test'
         );
 
-        $this->assertInstanceOf(Customer::class, $customer);
+        $cardToken = new Token('pm_card_visa');
+
+        $card = $this->service->customers()->addCard($customer, $cardToken);
+
+        $this->assertInstanceOf(Card::class, $card);
     }
 
     /**
@@ -75,40 +79,12 @@ class ServiceTest extends TestCase
     }
 
     /**
-     * Tests that an exception is thrown when trying to retrieve a customer with a wrong token type.
-     */
-    public function testRetrieveCustomerWithWrongTokenTypeThrowException()
-    {
-        $paymentMethodToken = new Token('pm_card_visa');
-
-        $this->expectException(\Exception::class);
-
-        $this->service->customers()->find($paymentMethodToken);
-    }
-
-    /**
      * Tests that a customer can be created with a card token.
      */
     public function testItCanCreateCustomerWithCardToken()
     {
         $customer = $this->service->customers()->create(
             new Token('tok_visa'),
-            'software@pod-point.com',
-            'test'
-        );
-
-        $this->assertInstanceOf(Customer::class, $customer);
-    }
-
-    /**
-     * Tests throw exception if trying to create customer with a bad token.
-     */
-    public function testThrowExceptionIfBadTokenType()
-    {
-        $this->expectException(\Exception::class);
-
-        $customer = $this->service->customers()->create(
-            new Token('tok_token'),
             'software@pod-point.com',
             'test'
         );

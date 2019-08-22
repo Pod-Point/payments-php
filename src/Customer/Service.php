@@ -3,6 +3,7 @@
 namespace PodPoint\Payments\Customer;
 
 use PodPoint\Payments\Customer;
+use PodPoint\Payments\Card;
 use PodPoint\Payments\Token;
 
 interface Service
@@ -26,4 +27,33 @@ interface Service
      * @return Customer
      */
     public function find(Token $token): Customer;
+
+    /**
+     * Add a card to a customer.
+     *
+     * @param Customer $customer
+     * @param Token $cardToken
+     *
+     * @return Card
+     */
+    public function addCard(Customer $customer, Token $cardToken): Card;
+
+    /**
+     * Remove a card from a customer.
+     *
+     * @param Customer $customer
+     * @param Card $card
+     *
+     * @return void
+     */
+    public function deleteCard(Customer $customer, Card $card): void;
+
+    /**
+     * Get customer's cards.
+     *
+     * @param Customer $customer
+     *
+     * @return Card[]
+     */
+    public function getCards(Customer $customer): array;
 }

@@ -11,7 +11,6 @@ class Token extends \PodPoint\Payments\Token
     const PAYMENT_METHOD = 'payment_method';
     const SETUP_INTENT = 'setup_intent_id';
     const SECRET_SETUP_INTENT = 'secret_setup_intent';
-    const SETUP_CARD_CREATION = 'setup_card_creation';
     const CARD = 'card';
     const CHARGE = 'charge';
     const SETUP = 'setup';
@@ -47,7 +46,8 @@ class Token extends \PodPoint\Payments\Token
 
                     return self::SECRET_SETUP_INTENT;
                 default:
-                    throw new \Exception('Unknown type of secret token');
+
+                    return null;
             }
         }
 
@@ -73,11 +73,9 @@ class Token extends \PodPoint\Payments\Token
             case $this->startsWith('tok'):
 
                 return self::TOKEN;
-            case $this->startsWith('setup'):
-
-                return self::SETUP_CARD_CREATION;
             default:
-                throw new \Exception('Unknown type of token');
+
+                return null;
         }
     }
 

@@ -3,9 +3,8 @@
 namespace PodPoint\Payments\Providers\Stripe\Card;
 
 use PodPoint\Payments\Token;
-use PodPoint\Payments\ExceptionInterface;
 
-class Exception extends \Exception implements ExceptionInterface
+class Exception extends \Exception
 {
     /**
      * The response from the API.

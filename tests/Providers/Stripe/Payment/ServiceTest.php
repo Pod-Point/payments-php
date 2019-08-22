@@ -162,28 +162,4 @@ class ServiceTest extends TestCase
 
         $this->assertEquals($paymentIntent->type, Token::PAYMENT_INTENT);
     }
-
-    /**
-     * Tests that creating a payment with a bad customer token throw exception.
-     */
-    public function testCreatingPaymentWithBadCustomerTokenThrowException()
-    {
-        $paymentMethodToken = new Token('pm_card_visa');
-
-        $badCustomerToken = new Token('pm_card_visa');
-
-        $this->expectException(\Exception::class);
-
-        $this->service->create($paymentMethodToken, 100, 'GBP', null, [], $badCustomerToken);
-    }
-
-    /**
-     * Tests get provider name.
-     */
-    public function testGetProviderName()
-    {
-        $providername = $this->service->getProviderName();
-
-        $this->assertEquals('stripe', $providername);
-    }
 }

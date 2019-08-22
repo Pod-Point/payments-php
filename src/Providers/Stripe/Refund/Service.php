@@ -45,6 +45,8 @@ class Service implements RefundServiceInterface
                 ]);
 
                 break;
+            default:
+                //
         }
 
         return new Refund($refund->id);

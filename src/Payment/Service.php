@@ -51,11 +51,4 @@ interface Service
      * @return RefundService
      */
     public function refunds(): RefundService;
-
-    /**
-     * Return the name of the provider.
-     *
-     * @return string
-     */
-    public function getProviderName(): string;
 }
