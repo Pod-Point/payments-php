@@ -33,12 +33,8 @@ class Service implements CustomerServiceInterface
                 $params['payment_method'] = $token->value;
 
                 break;
-            case StripeToken::TOKEN:
-                $params['source'] = $token->value;
-
-                break;
             default:
-                //
+                $params['source'] = $token->value;
         }
 
         /** @var StripeCustomer $customer */
@@ -127,20 +123,18 @@ class Service implements CustomerServiceInterface
             );
         }
 
-        /** @var StripeCustomer $customer */
-        $customer = StripeCustomer::retrieve($customer->uid);
+        /** @var \Stripe\Collection $cards */
+        $sourceCards = StripeCustomer::allSources($customer->uid, ['object' => 'card']);
 
-        if (property_exists($customer, 'cards')) {
-            foreach ($customer->cards->data as $card) {
-                $cards[] = new Card(
-                    $card->id,
-                    $card->last4,
-                    $card->brand,
-                    $card->funding,
-                    $card->exp_month,
-                    $card->exp_year
-                );
-            }
+        foreach ($sourceCards->data as $sourceCard) {
+            $cards[] = new Card(
+                $sourceCard->id,
+                $sourceCard->last4,
+                $sourceCard->brand,
+                $sourceCard->funding,
+                $sourceCard->exp_month,
+                $sourceCard->exp_year
+            );
         }
 
         return $cards;

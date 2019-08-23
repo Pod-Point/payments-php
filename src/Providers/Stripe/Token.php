@@ -16,8 +16,6 @@ class Token extends \PodPoint\Payments\Token
     const SETUP = 'setup';
 
     /**
-     * Token constructor.
-     *
      * @param string $value
      * @param string|null $type
      */
@@ -25,7 +23,7 @@ class Token extends \PodPoint\Payments\Token
     {
         parent::__construct($value, $type);
 
-        $this->type = $this->getTokenType($value);
+        $this->type = $this->getTokenType();
     }
 
     /**
@@ -76,10 +74,10 @@ class Token extends \PodPoint\Payments\Token
      *
      * @return bool
      */
-    private function startsWith(string $needle, string $token = null): bool
+    private function startsWith(string $needle): bool
     {
         $length = strlen($needle);
 
-        return (substr(trim($token ?? $this->value), 0, $length) === $needle);
+        return (substr(trim($this->value), 0, $length) === $needle);
     }
 }

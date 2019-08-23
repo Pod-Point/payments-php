@@ -7,6 +7,7 @@ use PodPoint\Payments\Providers\Stripe\Token;
 use PodPoint\Payments\Providers\Stripe\Payment\Service;
 use PodPoint\Payments\Tests\TestCase;
 use PodPoint\Payments\Card;
+use Stripe\Customer as StripeCustomer;
 
 class ServiceTest extends TestCase
 {
@@ -47,5 +48,33 @@ class ServiceTest extends TestCase
         $card = $this->service->cards()->find($token);
 
         $this->assertInstanceOf(Card::class, $card);
+    }
+
+    /**
+     * Test card can be deleted.
+     */
+    public function testCanDeleteCard()
+    {
+        $cardToken = new Token('pm_card_visa');
+
+        /** @var StripeCustomer $response */
+        $response = StripeCustomer::create([
+            'email' => 'software@pod-point.com',
+            'description' => 'test',
+        ]);
+
+        $customerToken = new Token($response->id);
+
+        $customer = $this->service->customers()->find($customerToken);
+
+        $card = $this->service->cards()->find($cardToken);
+
+        $this->service->customers()->addCard($customer, $card);
+
+        $this->service->cards()->delete($card);
+
+        $cards = $this->service->customers()->getCards($customer);
+
+        $this->assertEmpty($cards);
     }
 }

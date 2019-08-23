@@ -54,8 +54,14 @@ class Card
      * @param int $expirationMonth
      * @param int $expirationYear
      */
-    public function __construct(string $uid, string $last4, string $brand, string $funding, int $expirationMonth, int $expirationYear)
-    {
+    public function __construct(
+        string $uid,
+        string $last4,
+        string $brand,
+        string $funding,
+        int $expirationMonth,
+        int $expirationYear
+    ) {
         $this->uid = $uid;
         $this->last4 = $last4;
         $this->brand = $brand;

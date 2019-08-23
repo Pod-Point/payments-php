@@ -86,16 +86,6 @@ class Service implements ServiceInterface
                 ]);
 
                 break;
-            case StripeToken::TOKEN:
-                /** @var Charge $response */
-                $response = Charge::create([
-                    'amount'      => $amount,
-                    'currency'    => $currency,
-                    'source'      => $token->value,
-                    'metadata'    => $metadata
-                ]);
-
-                break;
             case StripeToken::PAYMENT_INTENT:
                 /** @var PaymentIntent $response */
                 $response = PaymentIntent::retrieve($token->value);
@@ -123,7 +113,13 @@ class Service implements ServiceInterface
 
                 break;
             default:
-                //
+                /** @var Charge $response */
+                $response = Charge::create([
+                    'amount'      => $amount,
+                    'currency'    => $currency,
+                    'source'      => $token->value,
+                    'metadata'    => $metadata
+                ]);
         }
 
         if ($response instanceof PaymentIntent && $response->status !== PaymentIntent::STATUS_SUCCEEDED) {
