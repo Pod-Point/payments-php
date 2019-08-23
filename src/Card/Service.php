@@ -8,7 +8,16 @@ use PodPoint\Payments\Token;
 interface Service
 {
     /**
-     * Create a card.
+     * Retrieves a card.
+     *
+     * @param string $uid
+     *
+     * @return Card
+     */
+    public function find(string $uid): Card;
+
+    /**
+     * Creates a card.
      *
      * @param Token|null $token
      *
@@ -17,18 +26,9 @@ interface Service
     public function create(Token $token = null): Card;
 
     /**
-     * Remove a card.
+     * Deletes a card.
      *
      * @param Card $card
      */
     public function delete(Card $card): void;
-
-    /**
-     * Retrieve a card.
-     *
-     * @param Token $token
-     *
-     * @return Card
-     */
-    public function find(Token $token): Card;
 }

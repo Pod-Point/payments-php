@@ -7,30 +7,30 @@ use PodPoint\Payments\Token;
 class Exception extends \Exception
 {
     /**
-     * The token containing the response from the API.
+     * The token returned from the Stripe API.
      *
      * @var Token
      */
-    private $response;
+    private $token;
 
     /**
-     * @param Token $response
+     * @param Token $token
      * @param \Throwable|null $previous
      */
-    public function __construct(Token $response, \Throwable $previous = null)
+    public function __construct(Token $token, \Throwable $previous = null)
     {
         parent::__construct('Failed to create a new card due to Stripe API response', 1, $previous);
 
-        $this->response = $response;
+        $this->token = $token;
     }
 
     /**
-     * Returns the token containing the response from the API.
+     * Returns the token returned from the Stripe API.
      *
      * @return Token
      */
-    public function getResponse(): Token
+    public function getToken(): Token
     {
-        return $this->response;
+        return $this->token;
     }
 }

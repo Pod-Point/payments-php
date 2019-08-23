@@ -35,7 +35,7 @@ class Service implements ServiceInterface
      * @param string $currency
      * @param string|null $description
      * @param array $metadata
-     * @param Token|null $customer
+     * @param string|null $customerUId
      *
      * @return Payment
      *
@@ -47,29 +47,14 @@ class Service implements ServiceInterface
         string $currency = 'GBP',
         string $description = null,
         array $metadata = [],
-        Token $customer = null
+        string $customerUId = null
     ): Payment {
         switch ($token->type) {
             case StripeToken::CUSTOMER:
-                $customer = $this->customers()->find($token);
+                $customer = $this->customers()->find($token->value);
 
                 $cards = $this->customers()->getCards($customer);
                 $card = $cards[0];
-
-                $paymentMethodToken = new StripeToken($card->uid);
-
-                if ($paymentMethodToken->type === StripeToken::CARD) {
-                    /** @var Charge $response */
-                    $response = Charge::create([
-                        'customer' => $customer->uid,
-                        'amount' => $amount,
-                        'currency' => $currency,
-                        'description' => $description,
-                        'metadata' => $metadata,
-                    ]);
-
-                    break;
-                }
 
                 /** @var PaymentIntent $response */
                 $response = PaymentIntent::create([
@@ -79,7 +64,7 @@ class Service implements ServiceInterface
                     'currency' => $currency,
                     'confirmation_method' => 'manual',
                     'confirm' => true,
-                    "payment_method_types" => ["card"],
+                    'payment_method_types' => ['card'],
                     'description' => $description,
                     'metadata' => $metadata,
                     'use_stripe_sdk' => true,
@@ -93,14 +78,11 @@ class Service implements ServiceInterface
 
                 break;
             case StripeToken::PAYMENT_METHOD:
-                if ($customer && $customer->type !== StripeToken::CUSTOMER) {
-                    throw new \Exception('You need to pass a valid customer token to charge a card one.');
-                }
-
+            case StripeToken::CARD:
                 /** @var PaymentIntent $response */
                 $response = PaymentIntent::create([
                     'payment_method' => $token->value,
-                    'customer' => $customer->value,
+                    'customer' => $customerUId,
                     'amount' => $amount,
                     'currency' => $currency,
                     'confirmation_method' => 'manual',
@@ -120,6 +102,8 @@ class Service implements ServiceInterface
                     'source'      => $token->value,
                     'metadata'    => $metadata
                 ]);
+
+                break;
         }
 
         if ($response instanceof PaymentIntent && $response->status !== PaymentIntent::STATUS_SUCCEEDED) {

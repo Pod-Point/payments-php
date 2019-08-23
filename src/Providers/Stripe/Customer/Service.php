@@ -33,8 +33,11 @@ class Service implements CustomerServiceInterface
                 $params['payment_method'] = $token->value;
 
                 break;
+            case StripeToken::CARD:
             default:
                 $params['source'] = $token->value;
+
+                break;
         }
 
         /** @var StripeCustomer $customer */
@@ -44,13 +47,13 @@ class Service implements CustomerServiceInterface
     }
 
     /**
-     * Tries retrieve a customer using the Stripe SDK.
+     * Retrieves a customer using the Stripe SDK.
      *
-     * @param Token $token
+     * @param string $uid
      *
      * @return Customer
      */
-    public function find(Token $token): Customer
+    public function find(string $uid): Customer
     {
         /** @var StripeCustomer $customer */
         $response = StripeCustomer::retrieve($token->value);
@@ -59,7 +62,7 @@ class Service implements CustomerServiceInterface
     }
 
     /**
-     * Tries add a card to a customer using the Stripe SDK.
+     * Associates a card to a customer using the Stripe SDK.
      *
      * @param Customer $customer
      * @param Card $card
@@ -84,7 +87,7 @@ class Service implements CustomerServiceInterface
     }
 
     /**
-     * Tries remove a source API card from a customer using the Stripe SDK.
+     * Deletes a customers card using the Stripe SDK.
      *
      * @param Customer $customer
      * @param Card $card
@@ -97,7 +100,7 @@ class Service implements CustomerServiceInterface
     }
 
     /**
-     * Tries get customer's cards using the Stripe SDK.
+     * Retrieves a customers cards using the Stripe SDK.
      *
      * @param Customer $customer
      *
@@ -108,8 +111,8 @@ class Service implements CustomerServiceInterface
         $cards = [];
 
         $paymentMethods = PaymentMethod::all([
-            "customer" => $customer->uid,
-            "type" => "card",
+            'customer' => $customer->uid,
+            'type' => 'card',
         ]);
 
         foreach ($paymentMethods->data as $paymentMethod) {
@@ -120,20 +123,6 @@ class Service implements CustomerServiceInterface
                 $paymentMethod->card->funding,
                 $paymentMethod->card->exp_month,
                 $paymentMethod->card->exp_year
-            );
-        }
-
-        /** @var \Stripe\Collection $cards */
-        $sourceCards = StripeCustomer::allSources($customer->uid, ['object' => 'card']);
-
-        foreach ($sourceCards->data as $sourceCard) {
-            $cards[] = new Card(
-                $sourceCard->id,
-                $sourceCard->last4,
-                $sourceCard->brand,
-                $sourceCard->funding,
-                $sourceCard->exp_month,
-                $sourceCard->exp_year
             );
         }
 

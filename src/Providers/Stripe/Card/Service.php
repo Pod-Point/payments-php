@@ -13,6 +13,27 @@ use Stripe\PaymentMethod;
 class Service implements ServiceInterface
 {
     /**
+     * Retrieves a card using the Stripe SDK.
+     *
+     * @param string $uid
+     *
+     * @return Card
+     */
+    public function find(string $uid): Card
+    {
+        $paymentMethod = PaymentMethod::retrieve($uid);
+
+        return new Card(
+            $paymentMethod->id,
+            $paymentMethod->card->last4,
+            $paymentMethod->card->brand,
+            $paymentMethod->card->funding,
+            $paymentMethod->card->exp_month,
+            $paymentMethod->card->exp_year
+        );
+    }
+
+    /**
      * Tries create a card using the Stripe SDK.
      *
      * @param Token|null $token
@@ -54,7 +75,7 @@ class Service implements ServiceInterface
     }
 
     /**
-     * Tries remove a card using the Stripe SDK.
+     * Deletes a card using the Stripe SDK.
      *
      * @param Card $card
      */
@@ -63,26 +84,5 @@ class Service implements ServiceInterface
         $paymentMethod = PaymentMethod::retrieve($card->uid);
 
         $paymentMethod->detach();
-    }
-
-    /**
-     * Tries retrieve a card using the Stripe SDK.
-     *
-     * @param Token $token
-     *
-     * @return Card
-     */
-    public function find(Token $token): Card
-    {
-        $paymentMethod = PaymentMethod::retrieve($token->value);
-
-        return new Card(
-            $paymentMethod->id,
-            $paymentMethod->card->last4,
-            $paymentMethod->card->brand,
-            $paymentMethod->card->funding,
-            $paymentMethod->card->exp_month,
-            $paymentMethod->card->exp_year
-        );
     }
 }

@@ -20,16 +20,16 @@ interface Service
     public function create(Token $token, string $email, string $description): Customer;
 
     /**
-     * Retrieve a Customer.
+     * Retrieves a customer.
      *
-     * @param Token $token
+     * @param string $uid
      *
      * @return Customer
      */
-    public function find(Token $token): Customer;
+    public function find(string $uid): Customer;
 
     /**
-     * Add a card to a customer.
+     * Associates a card to a customer.
      *
      * @param Customer $customer
      * @param Card $card
@@ -39,7 +39,7 @@ interface Service
     public function addCard(Customer $customer, Card $card): Card;
 
     /**
-     * Remove a card from a customer.
+     * Deletes a customers card.
      *
      * @param Customer $customer
      * @param Card $card
@@ -49,7 +49,7 @@ interface Service
     public function deleteCard(Customer $customer, Card $card): void;
 
     /**
-     * Get customer's cards.
+     * Retrieves a customers cards.
      *
      * @param Customer $customer
      *

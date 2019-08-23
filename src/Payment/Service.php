@@ -18,7 +18,7 @@ interface Service
      * @param string $currency
      * @param string|null $description
      * @param array $metadata
-     * @param Token|null $customer
+     * @param string|null $customerUId
      *
      * @return Payment
      */
@@ -28,7 +28,7 @@ interface Service
         string $currency = 'GBP',
         string $description = null,
         array $metadata = [],
-        Token $customer = null
+        string $customerUId = null
     ): Payment;
 
     /**
