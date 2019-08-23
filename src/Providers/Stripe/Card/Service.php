@@ -27,13 +27,11 @@ class Service implements ServiceInterface
             /** @var SetupIntent $response */
             $response = SetupIntent::retrieve($token->value);
         } else {
-            $params = [
+            /** @var SetupIntent $response */
+            $response = SetupIntent::create([
                 'usage' => 'on_session',
                 'payment_method_types' => ['card'],
-            ];
-
-            /** @var SetupIntent $response */
-            $response = SetupIntent::create($params);
+            ]);
         }
 
         if ($response->status !== SetupIntent::STATUS_SUCCEEDED) {
