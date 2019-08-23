@@ -7,7 +7,7 @@ use PodPoint\Payments\Token;
 class Exception extends \Exception
 {
     /**
-     * The response from the API.
+     * The token containing the response from the API.
      *
      * @var Token
      */
@@ -25,7 +25,7 @@ class Exception extends \Exception
     }
 
     /**
-     * Returns the response from the API.
+     * Returns the token containing the response from the API.
      *
      * @return Token
      */
