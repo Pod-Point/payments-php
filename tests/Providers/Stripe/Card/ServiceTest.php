@@ -34,7 +34,7 @@ class ServiceTest extends TestCase
         try {
             $this->service->cards()->create();
         } catch (Exception $e) {
-            $this->assertEquals(Token::SECRET_SETUP_INTENT, $e->getResponse()->type);
+            $this->assertEquals(Token::SECRET_SETUP_INTENT, $e->getToken()->type);
         }
     }
 
@@ -43,9 +43,7 @@ class ServiceTest extends TestCase
      */
     public function testCanFindCard()
     {
-        $token = new Token('pm_card_visa');
-
-        $card = $this->service->cards()->find($token);
+        $card = $this->service->cards()->find('pm_card_visa');
 
         $this->assertInstanceOf(Card::class, $card);
     }
@@ -55,19 +53,15 @@ class ServiceTest extends TestCase
      */
     public function testCanDeleteCard()
     {
-        $cardToken = new Token('pm_card_visa');
-
         /** @var StripeCustomer $response */
         $response = StripeCustomer::create([
             'email' => 'software@pod-point.com',
             'description' => 'test',
         ]);
 
-        $customerToken = new Token($response->id);
+        $customer = $this->service->customers()->find($response->id);
 
-        $customer = $this->service->customers()->find($customerToken);
-
-        $card = $this->service->cards()->find($cardToken);
+        $card = $this->service->cards()->find('pm_card_visa');
 
         $this->service->customers()->addCard($customer, $card);
 

@@ -50,7 +50,7 @@ class ServiceTest extends TestCase
             'test'
         );
 
-        $card = $this->service->cards()->find(new Token('pm_card_visa'));
+        $card = $this->service->cards()->find('pm_card_visa');
 
         $card = $this->service->customers()->addCard($customer, $card);
 
@@ -60,7 +60,7 @@ class ServiceTest extends TestCase
     /**
      * Tests can retrieve an existing customer.
      */
-    public function testRetrieveCustomer()
+    public function testCanRetrieveCustomer()
     {
         $email = 'john@pod-point.com';
         $description = "This is $email test decription";
@@ -71,9 +71,7 @@ class ServiceTest extends TestCase
             $description
         );
 
-        $token = new Token($customer->uid);
-
-        $customer = $this->service->customers()->find($token);
+        $customer = $this->service->customers()->find($customer->uid);
 
         $this->assertInstanceOf(Customer::class, $customer);
     }

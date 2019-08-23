@@ -96,7 +96,7 @@ class ServiceTest extends TestCase
 
         $charge = new Token($payment->uid);
 
-        $this->assertEquals($charge->type, Token::CHARGE);
+        $this->assertEquals($charge->type, Token::PAYMENT_INTENT);
     }
 
     /**
@@ -152,9 +152,7 @@ class ServiceTest extends TestCase
             'test'
         );
 
-        $customerToken = new Token($customer->uid);
-
-        $payment = $this->service->create($paymentMethodToken, 100, 'GBP', null, [], $customerToken);
+        $payment = $this->service->create($paymentMethodToken, 100, 'GBP', null, [], $customer->uid);
 
         $this->assertInstanceOf(Payment::class, $payment);
 

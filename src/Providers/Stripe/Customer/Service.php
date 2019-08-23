@@ -56,7 +56,7 @@ class Service implements CustomerServiceInterface
     public function find(string $uid): Customer
     {
         /** @var StripeCustomer $customer */
-        $response = StripeCustomer::retrieve($token->value);
+        $response = StripeCustomer::retrieve($uid);
 
         return new Customer($response->id, $response->email, $response->description);
     }
