@@ -3,6 +3,7 @@
 namespace PodPoint\Payments\Tests\Providers\Stripe\Customer;
 
 use PodPoint\Payments\Customer;
+use PodPoint\Payments\Card;
 use PodPoint\Payments\Providers\Stripe\Payment\Service;
 use PodPoint\Payments\Providers\Stripe\Token;
 use PodPoint\Payments\Tests\TestCase;
@@ -25,15 +26,52 @@ class ServiceTest extends TestCase
     }
 
     /**
-     * Tests that a customer can be created with a payment method token.
+     * Tests customer can be created.
      */
-    public function testItCanCreateCustomerWithPaymentMethod()
+    public function testCanCreateCustomer()
     {
         $customer = $this->service->customers()->create(
             new Token('pm_card_visa'),
             'software@pod-point.com',
             'test'
         );
+
+        $this->assertInstanceOf(Customer::class, $customer);
+    }
+
+    /**
+     * Tests can add card to customer.
+     */
+    public function testCanAddCard()
+    {
+        $customer = $this->service->customers()->create(
+            new Token('pm_card_visa'),
+            'software@pod-point.com',
+            'test'
+        );
+
+        $card = $this->service->cards()->find('pm_card_visa');
+
+        $card = $this->service->customers()->addCard($customer, $card);
+
+        $this->assertInstanceOf(Card::class, $card);
+    }
+
+    /**
+     * Tests can retrieve an existing customer.
+     */
+    public function testCanRetrieveCustomer()
+    {
+        $email = 'john@pod-point.com';
+        $description = "This is $email test decription";
+
+        $customer = $this->service->customers()->create(
+            new Token('pm_card_visa'),
+            $email,
+            $description
+        );
+
+        $customer = $this->service->customers()->find($customer->uid);
 
         $this->assertInstanceOf(Customer::class, $customer);
     }

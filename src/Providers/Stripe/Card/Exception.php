@@ -1,6 +1,6 @@
 <?php
 
-namespace PodPoint\Payments\Providers\Stripe\Payment;
+namespace PodPoint\Payments\Providers\Stripe\Card;
 
 use PodPoint\Payments\Token;
 
@@ -19,7 +19,7 @@ class Exception extends \Exception
      */
     public function __construct(Token $token, \Throwable $previous = null)
     {
-        parent::__construct('Failed to create payment due to Stripe API response.', 1, $previous);
+        parent::__construct('Failed to create a new card due to Stripe API response', 1, $previous);
 
         $this->token = $token;
     }

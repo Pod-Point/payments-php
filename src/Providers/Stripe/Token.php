@@ -2,19 +2,20 @@
 
 namespace PodPoint\Payments\Providers\Stripe;
 
-use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
-
 class Token extends \PodPoint\Payments\Token
 {
     const CUSTOMER = 'customer';
+    const TOKEN = 'token';
     const PAYMENT_INTENT = 'payment_intent_id';
+    const SECRET_PAYMENT_INTENT = 'secret_payment_intent';
     const PAYMENT_METHOD = 'payment_method';
-    const CHARGE = 'charge';
+    const SETUP_INTENT = 'setup_intent_id';
+    const SECRET_SETUP_INTENT = 'secret_setup_intent';
     const CARD = 'card';
+    const CHARGE = 'charge';
+    const SETUP = 'setup';
 
     /**
-     * Token constructor.
-     *
      * @param string $value
      * @param string|null $type
      */
@@ -22,7 +23,7 @@ class Token extends \PodPoint\Payments\Token
     {
         parent::__construct($value, $type);
 
-        $this->type = $this->getTokenType($value);
+        $this->type = $this->getTokenType();
     }
 
     /**
@@ -32,26 +33,35 @@ class Token extends \PodPoint\Payments\Token
      *
      * @return string|null
      */
-    protected function getTokenType(string $token): ?string
+    protected function getTokenType(): ?string
     {
+        if (strpos($this->value, 'secret') !== false) {
+            switch (true) {
+                case $this->startsWith('pi'):
+                    return self::SECRET_PAYMENT_INTENT;
+                case $this->startsWith('seti'):
+                    return self::SECRET_SETUP_INTENT;
+                default:
+                    return null;
+            }
+        }
+
         switch (true) {
-            case $this->startsWith('pi', $token):
-
-                return StripeToken::PAYMENT_INTENT;
-            case $this->startsWith('pm', $token):
-
-                return StripeToken::PAYMENT_METHOD;
-            case $this->startsWith('cus', $token):
-
-                return StripeToken::CUSTOMER;
-            case $this->startsWith('ch', $token):
-
-                return StripeToken::CHARGE;
-            case $this->startsWith('card', $token):
-
-                return StripeToken::CARD;
+            case $this->startsWith('pi'):
+                return self::PAYMENT_INTENT;
+            case $this->startsWith('pm'):
+                return self::PAYMENT_METHOD;
+            case $this->startsWith('card'):
+                return self::CARD;
+            case $this->startsWith('cus'):
+                return self::CUSTOMER;
+            case $this->startsWith('ch'):
+                return self::CHARGE;
+            case $this->startsWith('seti'):
+                return self::SETUP_INTENT;
+            case $this->startsWith('tok'):
+                return self::TOKEN;
             default:
-
                 return null;
         }
     }
@@ -64,10 +74,10 @@ class Token extends \PodPoint\Payments\Token
      *
      * @return bool
      */
-    private function startsWith(string $needle, string $token = null): bool
+    private function startsWith(string $needle): bool
     {
         $length = strlen($needle);
 
-        return (substr(trim($token ?? $this->value), 0, $length) === $needle);
+        return (substr(trim($this->value), 0, $length) === $needle);
     }
 }

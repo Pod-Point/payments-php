@@ -5,6 +5,7 @@ namespace PodPoint\Payments\Payment;
 use PodPoint\Payments\Payment;
 use PodPoint\Payments\Customer\Service as CustomerService;
 use PodPoint\Payments\Refund\Service as RefundService;
+use PodPoint\Payments\Card\Service as CardService;
 use PodPoint\Payments\Token;
 
 interface Service
@@ -17,6 +18,7 @@ interface Service
      * @param string $currency
      * @param string|null $description
      * @param array $metadata
+     * @param string|null $customerUid
      *
      * @return Payment
      */
@@ -25,15 +27,27 @@ interface Service
         int $amount,
         string $currency = 'GBP',
         string $description = null,
-        array $metadata = []
+        array $metadata = [],
+        string $customerUid = null
     ): Payment;
 
     /**
+     * Returns card service.
+     *
+     * @return CardService
+     */
+    public function cards(): CardService;
+
+    /**
+     * Returns customer service.
+     *
      * @return CustomerService
      */
     public function customers(): CustomerService;
 
     /**
+     * Returns refund service.
+     *
      * @return RefundService
      */
     public function refunds(): RefundService;

@@ -12,6 +12,9 @@ class TokenTest extends TestCase
      */
     public function testCanIdentifyCorrectTokenTypes()
     {
+        $token = new Token('pi_some_xxx_secret_xxx');
+        $this->assertEquals($token->type, Token::SECRET_PAYMENT_INTENT);
+
         $token = new Token('pi_some_xxx');
         $this->assertEquals($token->type, Token::PAYMENT_INTENT);
 
@@ -26,5 +29,14 @@ class TokenTest extends TestCase
 
         $token = new Token('card_xxxyyy');
         $this->assertEquals($token->type, Token::CARD);
+
+        $token = new Token('tok_some_xxx');
+        $this->assertEquals($token->type, Token::TOKEN);
+
+        $token = new Token('seti_some_xxx_secret_xxx');
+        $this->assertEquals($token->type, Token::SECRET_SETUP_INTENT);
+
+        $token = new Token('seti_some_xxx');
+        $this->assertEquals($token->type, Token::SETUP_INTENT);
     }
 }

@@ -5,6 +5,8 @@ namespace PodPoint\Payments\Providers\Stripe\Payment;
 use PodPoint\Payments\Payment;
 use PodPoint\Payments\Customer\Service as CustomerServiceInterface;
 use PodPoint\Payments\Refund\Service as RefundServiceInterface;
+use PodPoint\Payments\Card\Service as CardServiceInterface;
+use PodPoint\Payments\Providers\Stripe\Card\Service as CardService;
 use PodPoint\Payments\Providers\Stripe\Customer\Service as CustomerService;
 use PodPoint\Payments\Providers\Stripe\Refund\Service as RefundService;
 use PodPoint\Payments\Providers\Stripe\Payment\Exception as StripeException;
@@ -13,7 +15,6 @@ use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 use PodPoint\Payments\Token;
 use Stripe\Charge;
 use Stripe\PaymentIntent;
-use Stripe\PaymentMethod;
 use Stripe\Stripe;
 
 class Service implements ServiceInterface
@@ -34,6 +35,7 @@ class Service implements ServiceInterface
      * @param string $currency
      * @param string|null $description
      * @param array $metadata
+     * @param string|null $customerUid
      *
      * @return Payment
      *
@@ -44,42 +46,28 @@ class Service implements ServiceInterface
         int $amount,
         string $currency = 'GBP',
         string $description = null,
-        array $metadata = []
+        array $metadata = [],
+        string $customerUid = null
     ): Payment {
         switch ($token->type) {
             case StripeToken::CUSTOMER:
-                $paymentMethods = PaymentMethod::all([
-                    'customer' => $token->value,
-                    'type' => 'card',
-                ]);
+                $customer = $this->customers()->find($token->value);
 
-                /** @var PaymentMethod $paymentMethod */
-                $paymentMethod = $paymentMethods->data[0];
+                $cards = $this->customers()->getCards($customer);
+                $card = $cards[0];
 
-                $paymentMethodToken = new StripeToken($paymentMethod->id);
-
-                if ($paymentMethodToken->type === StripeToken::CARD) {
-                    /** @var Charge $response */
-                    $response = Charge::create([
-                        'customer' => $token->value,
-                        'amount' => $amount,
-                        'currency' => $currency,
-                        'description' => $description,
-                        'metadata' => $metadata,
-                    ]);
-
-                    break;
-                }
-
+                /** @var PaymentIntent $response */
                 $response = PaymentIntent::create([
-                    'payment_method' => $paymentMethod->id,
-                    'customer' => $token->value,
+                    'payment_method' => $card->uid,
+                    'customer' => $customer->uid,
                     'amount' => $amount,
                     'currency' => $currency,
                     'confirmation_method' => 'manual',
                     'confirm' => true,
+                    'payment_method_types' => ['card'],
                     'description' => $description,
                     'metadata' => $metadata,
+                    'use_stripe_sdk' => true,
                 ]);
 
                 break;
@@ -89,13 +77,53 @@ class Service implements ServiceInterface
                 $response->confirm();
 
                 break;
+            case StripeToken::PAYMENT_METHOD:
+            case StripeToken::CARD:
+                /** @var PaymentIntent $response */
+                $response = PaymentIntent::create([
+                    'payment_method' => $token->value,
+                    'customer' => $customerUid,
+                    'amount' => $amount,
+                    'currency' => $currency,
+                    'confirmation_method' => 'manual',
+                    'confirm' => true,
+                    'payment_method_types' => ['card'],
+                    'description' => $description,
+                    'metadata' => $metadata,
+                    'use_stripe_sdk' => true,
+                ]);
+
+                break;
+            case StripeToken::CHARGE:
+            default:
+                /** @var Charge $response */
+                $response = Charge::create([
+                    'amount'      => $amount,
+                    'currency'    => $currency,
+                    'source'      => $token->value,
+                    'metadata'    => $metadata
+                ]);
+
+                break;
         }
 
         if ($response instanceof PaymentIntent && $response->status !== PaymentIntent::STATUS_SUCCEEDED) {
-            throw new StripeException($response);
+            $token = new StripeToken($response->client_secret);
+
+            throw new StripeException($token);
         }
 
-        return new Payment($response->id, $response->currency, $response->amount, $response->created);
+        return new Payment($response->id, $response->amount, $response->currency, $response->created);
+    }
+
+    /**
+     * Returns card service.
+     *
+     * @return CardServiceInterface
+     */
+    public function cards(): CardServiceInterface
+    {
+        return new CardService();
     }
 
     /**
