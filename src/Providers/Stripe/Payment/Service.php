@@ -94,6 +94,7 @@ class Service implements ServiceInterface
                 ]);
 
                 break;
+            case StripeToken::CHARGE:
             default:
                 /** @var Charge $response */
                 $response = Charge::create([
