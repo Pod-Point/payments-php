@@ -35,7 +35,7 @@ class Service implements ServiceInterface
      * @param string $currency
      * @param string|null $description
      * @param array $metadata
-     * @param string|null $customerUId
+     * @param string|null $customerUid
      *
      * @return Payment
      *
@@ -47,7 +47,7 @@ class Service implements ServiceInterface
         string $currency = 'GBP',
         string $description = null,
         array $metadata = [],
-        string $customerUId = null
+        string $customerUid = null
     ): Payment {
         switch ($token->type) {
             case StripeToken::CUSTOMER:
@@ -82,7 +82,7 @@ class Service implements ServiceInterface
                 /** @var PaymentIntent $response */
                 $response = PaymentIntent::create([
                     'payment_method' => $token->value,
-                    'customer' => $customerUId,
+                    'customer' => $customerUid,
                     'amount' => $amount,
                     'currency' => $currency,
                     'confirmation_method' => 'manual',
