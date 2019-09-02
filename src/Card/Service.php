@@ -24,11 +24,4 @@ interface Service
      * @return Card
      */
     public function create(Token $token = null): Card;
-
-    /**
-     * Deletes a card.
-     *
-     * @param string $uid
-     */
-    public function delete(string $uid): void;
 }

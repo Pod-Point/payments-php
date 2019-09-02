@@ -73,16 +73,4 @@ class Service implements ServiceInterface
             $paymentMethod->card->exp_year
         );
     }
-
-    /**
-     * Deletes a card using the Stripe SDK.
-     *
-     * @param string $uid
-     */
-    public function delete(string $uid): void
-    {
-        $paymentMethod = PaymentMethod::retrieve($uid);
-
-        $paymentMethod->detach();
-    }
 }
