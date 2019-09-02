@@ -51,9 +51,9 @@ interface Service
     /**
      * Retrieves a customers cards.
      *
-     * @param string $customerUid
+     * @param string $uid
      *
      * @return Card[]
      */
-    public function getCards(string $customerUid): array;
+    public function getCards(string $uid): array;
 }

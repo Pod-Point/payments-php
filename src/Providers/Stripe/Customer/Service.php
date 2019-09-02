@@ -102,16 +102,16 @@ class Service implements CustomerServiceInterface
     /**
      * Retrieves a customers cards using the Stripe SDK.
      *
-     * @param string $customerUid
+     * @param string $uid
      *
      * @return Card[]
      */
-    public function getCards(string $customerUid): array
+    public function getCards(string $uid): array
     {
         $cards = [];
 
         $paymentMethods = PaymentMethod::all([
-            'customer' => $customerUid,
+            'customer' => $uid,
             'type' => 'card',
         ]);
 
