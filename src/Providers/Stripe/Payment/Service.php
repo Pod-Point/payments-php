@@ -51,15 +51,13 @@ class Service implements ServiceInterface
     ): Payment {
         switch ($token->type) {
             case StripeToken::CUSTOMER:
-                $customer = $this->customers()->find($token->value);
-
-                $cards = $this->customers()->getCards($customer);
+                $cards = $this->customers()->getCards($token->value);
                 $card = $cards[0];
 
                 /** @var PaymentIntent $response */
                 $response = PaymentIntent::create([
                     'payment_method' => $card->uid,
-                    'customer' => $customer->uid,
+                    'customer' => $token->value,
                     'amount' => $amount,
                     'currency' => $currency,
                     'confirmation_method' => 'manual',

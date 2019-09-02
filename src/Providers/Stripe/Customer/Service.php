@@ -64,17 +64,17 @@ class Service implements CustomerServiceInterface
     /**
      * Associates a card to a customer using the Stripe SDK.
      *
-     * @param Customer $customer
-     * @param Card $card
+     * @param string $customerUid
+     * @param string $cardUid
      *
      * @return Card
      */
-    public function addCard(Customer $customer, Card $card): Card
+    public function addCard(string $customerUid, string $cardUid): Card
     {
         /** @var PaymentMethod $paymentMethod */
-        $paymentMethod = PaymentMethod::retrieve($card->uid);
+        $paymentMethod = PaymentMethod::retrieve($cardUid);
 
-        $response = $paymentMethod->attach(['customer' => $customer->uid]);
+        $response = $paymentMethod->attach(['customer' => $customerUid]);
 
         return new Card(
             $response->id,
@@ -89,29 +89,29 @@ class Service implements CustomerServiceInterface
     /**
      * Deletes a customers card using the Stripe SDK.
      *
-     * @param Customer $customer
-     * @param Card $card
+     * @param string $customerUid
+     * @param string $cardUid
      *
      * @return void
      */
-    public function deleteCard(Customer $customer, Card $card): void
+    public function deleteCard(string $customerUid, string $cardUid): void
     {
-        StripeCustomer::deleteSource($customer->uid, $card->uid);
+        StripeCustomer::deleteSource($customerUid, $cardUid);
     }
 
     /**
      * Retrieves a customers cards using the Stripe SDK.
      *
-     * @param Customer $customer
+     * @param string $customerUid
      *
      * @return Card[]
      */
-    public function getCards(Customer $customer): array
+    public function getCards(string $customerUid): array
     {
         $cards = [];
 
         $paymentMethods = PaymentMethod::all([
-            'customer' => $customer->uid,
+            'customer' => $customerUid,
             'type' => 'card',
         ]);
 

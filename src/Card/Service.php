@@ -28,7 +28,7 @@ interface Service
     /**
      * Deletes a card.
      *
-     * @param Card $card
+     * @param string $uid
      */
-    public function delete(Card $card): void;
+    public function delete(string $uid): void;
 }

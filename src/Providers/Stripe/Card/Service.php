@@ -77,11 +77,11 @@ class Service implements ServiceInterface
     /**
      * Deletes a card using the Stripe SDK.
      *
-     * @param Card $card
+     * @param string $uid
      */
-    public function delete(Card $card): void
+    public function delete(string $uid): void
     {
-        $paymentMethod = PaymentMethod::retrieve($card->uid);
+        $paymentMethod = PaymentMethod::retrieve($uid);
 
         $paymentMethod->detach();
     }

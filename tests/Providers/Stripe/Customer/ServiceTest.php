@@ -50,9 +50,7 @@ class ServiceTest extends TestCase
             'test'
         );
 
-        $card = $this->service->cards()->find('pm_card_visa');
-
-        $card = $this->service->customers()->addCard($customer, $card);
+        $card = $this->service->customers()->addCard($customer->uid, 'pm_card_visa');
 
         $this->assertInstanceOf(Card::class, $card);
     }

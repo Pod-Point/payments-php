@@ -59,15 +59,11 @@ class ServiceTest extends TestCase
             'description' => 'test',
         ]);
 
-        $customer = $this->service->customers()->find($response->id);
+        $card = $this->service->customers()->addCard($response->id, 'pm_card_visa');
 
-        $card = $this->service->cards()->find('pm_card_visa');
+        $this->service->cards()->delete($card->uid);
 
-        $this->service->customers()->addCard($customer, $card);
-
-        $this->service->cards()->delete($card);
-
-        $cards = $this->service->customers()->getCards($customer);
+        $cards = $this->service->customers()->getCards($response->id);
 
         $this->assertEmpty($cards);
     }

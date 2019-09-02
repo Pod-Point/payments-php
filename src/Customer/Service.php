@@ -31,29 +31,29 @@ interface Service
     /**
      * Associates a card to a customer.
      *
-     * @param Customer $customer
-     * @param Card $card
+     * @param string $customerUid
+     * @param string $cardUid
      *
      * @return Card
      */
-    public function addCard(Customer $customer, Card $card): Card;
+    public function addCard(string $customerUid, string $cardUid): Card;
 
     /**
      * Deletes a customers card.
      *
-     * @param Customer $customer
-     * @param Card $card
+     * @param string $customerUid
+     * @param string $cardUid
      *
      * @return void
      */
-    public function deleteCard(Customer $customer, Card $card): void;
+    public function deleteCard(string $customerUid, string $cardUid): void;
 
     /**
      * Retrieves a customers cards.
      *
-     * @param Customer $customer
+     * @param string $customerUid
      *
      * @return Card[]
      */
-    public function getCards(Customer $customer): array;
+    public function getCards(string $customerUid): array;
 }
