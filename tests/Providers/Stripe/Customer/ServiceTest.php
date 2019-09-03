@@ -94,17 +94,17 @@ class ServiceTest extends TestCase
      */
     public function testCanDeleteCard()
     {
-        /** @var StripeCustomer $response */
-        $response = StripeCustomer::create([
+        /** @var StripeCustomer $stripeCustomer */
+        $stripeCustomer = StripeCustomer::create([
             'email' => 'software@pod-point.com',
             'description' => 'test',
         ]);
 
-        $card = $this->service->customers()->addCard($response->id, 'pm_card_visa');
+        $card = $this->service->customers()->addCard($stripeCustomer->id, 'pm_card_visa');
 
-        $this->service->customers()->deleteCard($response->id, $card->uid);
+        $this->service->customers()->deleteCard($stripeCustomer->id, $card->uid);
 
-        $cards = $this->service->customers()->getCards($response->id);
+        $cards = $this->service->customers()->getCards($stripeCustomer->id);
 
         $this->assertEmpty($cards);
     }
