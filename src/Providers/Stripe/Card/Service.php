@@ -45,8 +45,16 @@ class Service implements ServiceInterface
     public function create(Token $token = null): Card
     {
         if ($token) {
-            /** @var SetupIntent $response */
-            $response = SetupIntent::retrieve($token->value);
+            switch ($token->type) {
+                case StripeToken::SETUP_INTENT:
+                    /** @var SetupIntent $response */
+                    $response = SetupIntent::retrieve($token->value);
+
+                    break;
+                case StripeToken::TOKEN:
+                default:
+                    return new Card($token->value);
+            }
         } else {
             /** @var SetupIntent $response */
             $response = SetupIntent::create([

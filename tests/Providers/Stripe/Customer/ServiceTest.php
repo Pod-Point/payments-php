@@ -41,6 +41,20 @@ class ServiceTest extends TestCase
     }
 
     /**
+     * Tests customer can be created with Source API card.
+     */
+    public function testCanCreateCustomerWithSourceAPIToken()
+    {
+        $customer = $this->service->customers()->create(
+            new Token('tok_visa'),
+            'software@pod-point.com',
+            'test'
+        );
+
+        $this->assertInstanceOf(Customer::class, $customer);
+    }
+
+    /**
      * Tests can add card to customer.
      */
     public function testCanAddCard()
@@ -52,6 +66,22 @@ class ServiceTest extends TestCase
         );
 
         $card = $this->service->customers()->addCard($customer->uid, 'pm_card_visa');
+
+        $this->assertInstanceOf(Card::class, $card);
+    }
+
+    /**
+     * Tests can add Source API card to customer.
+     */
+    public function testCanAddSourceApiCard()
+    {
+        $customer = $this->service->customers()->create(
+            new Token('pm_card_visa'),
+            'software@pod-point.com',
+            'test'
+        );
+
+        $card = $this->service->customers()->addCard($customer->uid, 'tok_visa');
 
         $this->assertInstanceOf(Card::class, $card);
     }

@@ -33,7 +33,7 @@ class Service implements CustomerServiceInterface
                 $params['payment_method'] = $token->value;
 
                 break;
-            case StripeToken::CARD:
+            case StripeToken::TOKEN:
             default:
                 $params['source'] = $token->value;
 
@@ -71,19 +71,39 @@ class Service implements CustomerServiceInterface
      */
     public function addCard(string $customerUid, string $cardUid): Card
     {
-        /** @var PaymentMethod $paymentMethod */
-        $paymentMethod = PaymentMethod::retrieve($cardUid);
+        switch ((new StripeToken($cardUid))->type) {
+            case StripeToken::PAYMENT_METHOD:
+                /** @var PaymentMethod $paymentMethod */
+                $paymentMethod = PaymentMethod::retrieve($cardUid);
 
-        $response = $paymentMethod->attach(['customer' => $customerUid]);
+                $response = $paymentMethod->attach(['customer' => $customerUid]);
 
-        return new Card(
-            $response->id,
-            $response->card->last4,
-            $response->card->brand,
-            $response->card->funding,
-            $response->card->exp_month,
-            $response->card->exp_year
-        );
+                return new Card(
+                    $response->id,
+                    $response->card->last4,
+                    $response->card->brand,
+                    $response->card->funding,
+                    $response->card->exp_month,
+                    $response->card->exp_year
+                );
+            case StripeToken::TOKEN:
+            default:
+                /** @var StripeCustomer $stripeCustomer */
+                $stripeCustomer = StripeCustomer::retrieve($customerUid);
+
+                $response = $stripeCustomer->sources->create([
+                    'source' => $cardUid,
+                ]);
+
+                return new Card(
+                    $response->id,
+                    $response->last4,
+                    $response->brand,
+                    $response->funding,
+                    $response->exp_month,
+                    $response->exp_year
+                );
+        }
     }
 
     /**
