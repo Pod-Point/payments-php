@@ -116,12 +116,18 @@ class Service implements CustomerServiceInterface
      */
     public function deleteCard(string $customerUid, string $cardUid): void
     {
-        if ((new StripeToken($cardUid))->type === StripeToken::PAYMENT_METHOD) {
-            $paymentMethod = PaymentMethod::retrieve($cardUid);
+        switch ((new StripeToken($cardUid))->type) {
+            case StripeToken::PAYMENT_METHOD:
+                $paymentMethod = PaymentMethod::retrieve($cardUid);
 
-            $paymentMethod->detach();
-        } else {
-            StripeCustomer::deleteSource($customerUid, $cardUid);
+                $paymentMethod->detach();
+
+                break;
+            case StripeToken::CARD:
+            default:
+                StripeCustomer::deleteSource($customerUid, $cardUid);
+
+                break;
         }
     }
 
