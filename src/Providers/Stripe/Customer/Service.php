@@ -49,14 +49,14 @@ class Service implements CustomerServiceInterface
     /**
      * Retrieves a customer using the Stripe SDK.
      *
-     * @param string $uid
+     * @param string $customerUid
      *
      * @return Customer
      */
-    public function find(string $uid): Customer
+    public function find(string $customerUid): Customer
     {
         /** @var StripeCustomer $customer */
-        $response = StripeCustomer::retrieve($uid);
+        $response = StripeCustomer::retrieve($customerUid);
 
         return new Customer($response->id, $response->email, $response->description);
     }
@@ -71,7 +71,9 @@ class Service implements CustomerServiceInterface
      */
     public function addCard(string $customerUid, string $cardUid): Card
     {
-        switch ((new StripeToken($cardUid))->type) {
+        $token = new StripeToken($cardUid);
+
+        switch ($token->type) {
             case StripeToken::PAYMENT_METHOD:
                 /** @var PaymentMethod $paymentMethod */
                 $paymentMethod = PaymentMethod::retrieve($cardUid);
@@ -134,16 +136,16 @@ class Service implements CustomerServiceInterface
     /**
      * Retrieves a customers cards using the Stripe SDK.
      *
-     * @param string $uid
+     * @param string $customerUid
      *
      * @return Card[]
      */
-    public function getCards(string $uid): array
+    public function getCards(string $customerUid): array
     {
         $cards = [];
 
         $paymentMethods = PaymentMethod::all([
-            'customer' => $uid,
+            'customer' => $customerUid,
             'type' => 'card',
         ]);
 

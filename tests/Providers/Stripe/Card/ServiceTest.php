@@ -46,17 +46,4 @@ class ServiceTest extends TestCase
 
         $this->assertInstanceOf(Card::class, $card);
     }
-
-    /**
-     * Test can handle source API cards.
-     */
-    public function testCanHandleSourceApiCards()
-    {
-        $token = new Token('tok_visa');
-        $card = $this->service->cards()->create($token);
-
-        $this->assertInstanceOf(Card::class, $card);
-
-        $this->assertEquals('tok_visa', $card->uid);
-    }
 }

@@ -15,13 +15,13 @@ class Service implements ServiceInterface
     /**
      * Retrieves a card using the Stripe SDK.
      *
-     * @param string $uid
+     * @param string $cardUid
      *
      * @return Card
      */
-    public function find(string $uid): Card
+    public function find(string $cardUid): Card
     {
-        $paymentMethod = PaymentMethod::retrieve($uid);
+        $paymentMethod = PaymentMethod::retrieve($cardUid);
 
         return new Card(
             $paymentMethod->id,
@@ -45,16 +45,8 @@ class Service implements ServiceInterface
     public function create(Token $token = null): Card
     {
         if ($token) {
-            switch ($token->type) {
-                case StripeToken::SETUP_INTENT:
-                    /** @var SetupIntent $response */
-                    $response = SetupIntent::retrieve($token->value);
-
-                    break;
-                case StripeToken::TOKEN:
-                default:
-                    return new Card($token->value);
-            }
+            /** @var SetupIntent $response */
+            $response = SetupIntent::retrieve($token->value);
         } else {
             /** @var SetupIntent $response */
             $response = SetupIntent::create([
@@ -80,5 +72,17 @@ class Service implements ServiceInterface
             $paymentMethod->card->exp_month,
             $paymentMethod->card->exp_year
         );
+    }
+
+    /**
+     * Deletes a card using the Stripe SDK.
+     *
+     * @param string $cardUid
+     */
+    public function delete(string $cardUid): void
+    {
+        $paymentMethod = PaymentMethod::retrieve($cardUid);
+
+        $paymentMethod->detach();
     }
 }

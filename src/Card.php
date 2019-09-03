@@ -48,19 +48,19 @@ class Card
 
     /**
      * @param string $uid
-     * @param string|null $last4
-     * @param string|null $brand
-     * @param string|null $funding
-     * @param int|null $expirationMonth
-     * @param int|null $expirationYear
+     * @param string $last4
+     * @param string $brand
+     * @param string $funding
+     * @param int $expirationMonth
+     * @param int $expirationYear
      */
     public function __construct(
         string $uid,
-        string $last4 = null,
-        string $brand = null,
-        string $funding = null,
-        int $expirationMonth = null,
-        int $expirationYear = null
+        string $last4,
+        string $brand,
+        string $funding,
+        int $expirationMonth,
+        int $expirationYear
     ) {
         $this->uid = $uid;
         $this->last4 = $last4;
