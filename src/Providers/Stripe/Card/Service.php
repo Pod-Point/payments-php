@@ -15,13 +15,15 @@ class Service implements ServiceInterface
     /**
      * Retrieves a card using the Stripe SDK.
      *
-     * @param string $uid
+     * @param string $cardUid
      *
      * @return Card
+     *
+     * @throws \Stripe\Error\Api
      */
-    public function find(string $uid): Card
+    public function find(string $cardUid): Card
     {
-        $paymentMethod = PaymentMethod::retrieve($uid);
+        $paymentMethod = PaymentMethod::retrieve($cardUid);
 
         return new Card(
             $paymentMethod->id,
@@ -41,6 +43,7 @@ class Service implements ServiceInterface
      * @return Card
      *
      * @throws CardException
+     * @throws \Stripe\Error\Api
      */
     public function create(Token $token = null): Card
     {
@@ -77,11 +80,15 @@ class Service implements ServiceInterface
     /**
      * Deletes a card using the Stripe SDK.
      *
-     * @param Card $card
+     * @param string $cardUid
+     *
+     * @return void
+     *
+     * @throws \Stripe\Error\Api
      */
-    public function delete(Card $card): void
+    public function delete(string $cardUid): void
     {
-        $paymentMethod = PaymentMethod::retrieve($card->uid);
+        $paymentMethod = PaymentMethod::retrieve($cardUid);
 
         $paymentMethod->detach();
     }

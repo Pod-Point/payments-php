@@ -7,6 +7,7 @@ use PodPoint\Payments\Card;
 use PodPoint\Payments\Providers\Stripe\Payment\Service;
 use PodPoint\Payments\Providers\Stripe\Token;
 use PodPoint\Payments\Tests\TestCase;
+use Stripe\Customer as StripeCustomer;
 
 class ServiceTest extends TestCase
 {
@@ -40,6 +41,20 @@ class ServiceTest extends TestCase
     }
 
     /**
+     * Tests customer can be created with Source API card.
+     */
+    public function testCanCreateCustomerWithSourceAPIToken()
+    {
+        $customer = $this->service->customers()->create(
+            new Token('tok_visa'),
+            'software@pod-point.com',
+            'test'
+        );
+
+        $this->assertInstanceOf(Customer::class, $customer);
+    }
+
+    /**
      * Tests can add card to customer.
      */
     public function testCanAddCard()
@@ -50,9 +65,23 @@ class ServiceTest extends TestCase
             'test'
         );
 
-        $card = $this->service->cards()->find('pm_card_visa');
+        $card = $this->service->customers()->addCard($customer->uid, 'pm_card_visa');
 
-        $card = $this->service->customers()->addCard($customer, $card);
+        $this->assertInstanceOf(Card::class, $card);
+    }
+
+    /**
+     * Tests can add Source API card to customer.
+     */
+    public function testCanAddSourceApiCard()
+    {
+        $customer = $this->service->customers()->create(
+            new Token('pm_card_visa'),
+            'software@pod-point.com',
+            'test'
+        );
+
+        $card = $this->service->customers()->addCard($customer->uid, 'tok_visa');
 
         $this->assertInstanceOf(Card::class, $card);
     }
@@ -88,5 +117,25 @@ class ServiceTest extends TestCase
         );
 
         $this->assertInstanceOf(Customer::class, $customer);
+    }
+
+    /**
+     * Test card can be deleted.
+     */
+    public function testCanDeleteCard()
+    {
+        $customer = $this->service->customers()->create(
+            new Token('tok_visa'),
+            'software@pod-point.com',
+            'test'
+        );
+
+        $cards = $this->service->customers()->getCards($customer->uid);
+
+        $this->service->customers()->deleteCard($customer->uid, $cards[0]->uid);
+
+        $cards = $this->service->customers()->getCards($customer->uid);
+
+        $this->assertEmpty($cards);
     }
 }

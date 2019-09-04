@@ -20,6 +20,8 @@ class Service implements CustomerServiceInterface
      * @param string $description
      *
      * @return Customer
+     *
+     * @throws \Stripe\Error\Api
      */
     public function create(Token $token, string $email, string $description): Customer
     {
@@ -33,7 +35,7 @@ class Service implements CustomerServiceInterface
                 $params['payment_method'] = $token->value;
 
                 break;
-            case StripeToken::CARD:
+            case StripeToken::TOKEN:
             default:
                 $params['source'] = $token->value;
 
@@ -49,14 +51,16 @@ class Service implements CustomerServiceInterface
     /**
      * Retrieves a customer using the Stripe SDK.
      *
-     * @param string $uid
+     * @param string $customerUid
      *
      * @return Customer
+     *
+     * @throws \Stripe\Error\Api
      */
-    public function find(string $uid): Customer
+    public function find(string $customerUid): Customer
     {
         /** @var StripeCustomer $customer */
-        $response = StripeCustomer::retrieve($uid);
+        $response = StripeCustomer::retrieve($customerUid);
 
         return new Customer($response->id, $response->email, $response->description);
     }
@@ -64,54 +68,82 @@ class Service implements CustomerServiceInterface
     /**
      * Associates a card to a customer using the Stripe SDK.
      *
-     * @param Customer $customer
-     * @param Card $card
+     * @param string $customerUid
+     * @param string $cardUid
      *
      * @return Card
+     *
+     * @throws \Stripe\Error\Api
      */
-    public function addCard(Customer $customer, Card $card): Card
+    public function addCard(string $customerUid, string $cardUid): Card
     {
-        /** @var PaymentMethod $paymentMethod */
-        $paymentMethod = PaymentMethod::retrieve($card->uid);
+        $token = new StripeToken($cardUid);
 
-        $response = $paymentMethod->attach(['customer' => $customer->uid]);
+        switch ($token->type) {
+            case StripeToken::PAYMENT_METHOD:
+                /** @var PaymentMethod $paymentMethod */
+                $paymentMethod = PaymentMethod::retrieve($cardUid);
 
-        return new Card(
-            $response->id,
-            $response->card->last4,
-            $response->card->brand,
-            $response->card->funding,
-            $response->card->exp_month,
-            $response->card->exp_year
-        );
+                $response = $paymentMethod->attach(['customer' => $customerUid]);
+
+                return new Card(
+                    $response->id,
+                    $response->card->last4,
+                    $response->card->brand,
+                    $response->card->funding,
+                    $response->card->exp_month,
+                    $response->card->exp_year
+                );
+            case StripeToken::TOKEN:
+            default:
+                /** @var StripeCustomer $stripeCustomer */
+                $stripeCustomer = StripeCustomer::retrieve($customerUid);
+
+                $response = $stripeCustomer->sources->create([
+                    'source' => $cardUid,
+                ]);
+
+                return new Card(
+                    $response->id,
+                    $response->last4,
+                    $response->brand,
+                    $response->funding,
+                    $response->exp_month,
+                    $response->exp_year
+                );
+        }
     }
 
     /**
      * Deletes a customers card using the Stripe SDK.
      *
-     * @param Customer $customer
-     * @param Card $card
+     * @param string $customerUid
+     * @param string $cardUid
      *
      * @return void
+     *
+     * @throws \Stripe\Error\Api
      */
-    public function deleteCard(Customer $customer, Card $card): void
+    public function deleteCard(string $customerUid, string $cardUid): void
     {
-        StripeCustomer::deleteSource($customer->uid, $card->uid);
+        StripeCustomer::deleteSource($customerUid, $cardUid);
     }
 
     /**
      * Retrieves a customers cards using the Stripe SDK.
      *
-     * @param Customer $customer
+     * @param string $customerUid
      *
      * @return Card[]
+     *
+     * @throws \Stripe\Error\Api
      */
-    public function getCards(Customer $customer): array
+    public function getCards(string $customerUid): array
     {
         $cards = [];
 
         $paymentMethods = PaymentMethod::all([
-            'customer' => $customer->uid,
+            'customer' => $customerUid,
             'type' => 'card',
         ]);
 

@@ -10,11 +10,11 @@ interface Service
     /**
      * Retrieves a card.
      *
-     * @param string $uid
+     * @param string $cardUid
      *
      * @return Card
      */
-    public function find(string $uid): Card;
+    public function find(string $cardUid): Card;
 
     /**
      * Creates a card.
@@ -28,7 +28,7 @@ interface Service
     /**
      * Deletes a card.
      *
-     * @param Card $card
+     * @param string $cardUid
      */
-    public function delete(Card $card): void;
+    public function delete(string $cardUid): void;
 }
