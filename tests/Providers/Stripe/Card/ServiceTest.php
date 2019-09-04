@@ -46,4 +46,24 @@ class ServiceTest extends TestCase
 
         $this->assertInstanceOf(Card::class, $card);
     }
+
+    /**
+     * Test card can be deleted.
+     */
+    public function testCanDeleteCard()
+    {
+        $customer = $this->service->customers()->create(
+            new Token('pm_card_visa'),
+            'software@pod-point.com',
+            'test'
+        );
+
+        $cards = $this->service->customers()->getCards($customer->uid);
+
+        $this->service->cards()->delete($cards[0]->uid);
+
+        $cards = $this->service->customers()->getCards($customer->uid);
+
+        $this->assertEmpty($cards);
+    }
 }
