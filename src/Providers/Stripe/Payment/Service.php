@@ -40,6 +40,7 @@ class Service implements ServiceInterface
      * @return Payment
      *
      * @throws Exception
+     * @throws \Stripe\Error\Api
      */
     public function create(
         Token $token,

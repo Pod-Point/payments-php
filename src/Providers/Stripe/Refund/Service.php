@@ -20,6 +20,8 @@ class Service implements RefundServiceInterface
      * @param array $metadata
      *
      * @return Refund
+     *
+     * @throws \Stripe\Error\Api
      */
     public function create(Token $token, int $amount, string $reason, array $metadata): Refund
     {

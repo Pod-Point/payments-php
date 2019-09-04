@@ -20,6 +20,8 @@ class Service implements CustomerServiceInterface
      * @param string $description
      *
      * @return Customer
+     *
+     * @throws \Stripe\Error\Api
      */
     public function create(Token $token, string $email, string $description): Customer
     {
@@ -52,6 +54,8 @@ class Service implements CustomerServiceInterface
      * @param string $customerUid
      *
      * @return Customer
+     *
+     * @throws \Stripe\Error\Api
      */
     public function find(string $customerUid): Customer
     {
@@ -68,6 +72,8 @@ class Service implements CustomerServiceInterface
      * @param string $cardUid
      *
      * @return Card
+     *
+     * @throws \Stripe\Error\Api
      */
     public function addCard(string $customerUid, string $cardUid): Card
     {
@@ -115,22 +121,12 @@ class Service implements CustomerServiceInterface
      * @param string $cardUid
      *
      * @return void
+     *
+     * @throws \Stripe\Error\Api
      */
     public function deleteCard(string $customerUid, string $cardUid): void
     {
-        switch ((new StripeToken($cardUid))->type) {
-            case StripeToken::PAYMENT_METHOD:
-                $paymentMethod = PaymentMethod::retrieve($cardUid);
-
-                $paymentMethod->detach();
-
-                break;
-            case StripeToken::CARD:
-            default:
-                StripeCustomer::deleteSource($customerUid, $cardUid);
-
-                break;
-        }
+        StripeCustomer::deleteSource($customerUid, $cardUid);
     }
 
     /**
@@ -139,6 +135,8 @@ class Service implements CustomerServiceInterface
      * @param string $customerUid
      *
      * @return Card[]
+     *
+     * @throws \Stripe\Error\Api
      */
     public function getCards(string $customerUid): array
     {

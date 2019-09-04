@@ -18,6 +18,8 @@ class Service implements ServiceInterface
      * @param string $cardUid
      *
      * @return Card
+     *
+     * @throws \Stripe\Error\Api
      */
     public function find(string $cardUid): Card
     {
@@ -41,6 +43,7 @@ class Service implements ServiceInterface
      * @return Card
      *
      * @throws CardException
+     * @throws \Stripe\Error\Api
      */
     public function create(Token $token = null): Card
     {
@@ -78,6 +81,10 @@ class Service implements ServiceInterface
      * Deletes a card using the Stripe SDK.
      *
      * @param string $cardUid
+     *
+     * @return void
+     *
+     * @throws \Stripe\Error\Api
      */
     public function delete(string $cardUid): void
     {
