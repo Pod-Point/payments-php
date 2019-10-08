@@ -5,7 +5,6 @@ namespace PodPoint\Payments\Providers\Stripe\Refund;
 use PodPoint\Payments\Refund;
 use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 use PodPoint\Payments\Token;
-use Stripe\Charge;
 use Stripe\PaymentIntent;
 use PodPoint\Payments\Refund\Service as RefundServiceInterface;
 
@@ -29,10 +28,7 @@ class Service implements RefundServiceInterface
             case StripeToken::PAYMENT_INTENT:
                 $paymentIntent = PaymentIntent::retrieve($token->value);
 
-                /** @var Charge $charge */
-                $charge = $paymentIntent->charges->data[0];
-
-                $chargeId = $charge->id;
+                $chargeId = $paymentIntent->charges->data[0]->id;
 
                 break;
             case StripeToken::CHARGE:
