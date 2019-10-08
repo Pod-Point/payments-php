@@ -27,27 +27,27 @@ class Service implements RefundServiceInterface
     {
         switch ($token->type) {
             case StripeToken::PAYMENT_INTENT:
-                $refund = PaymentIntent::retrieve($token->value);
+                $paymentIntent = PaymentIntent::retrieve($token->value);
 
                 /** @var Charge $charge */
-                $charge = $refund->charges->data[0];
-                $charge->refund([
-                    'amount' => $amount,
-                    'reason' => $reason,
-                    'metadata' => $metadata,
-                ]);
+                $charge = $paymentIntent->charges->data[0];
+
+                $chargeId = $charge->id;
 
                 break;
             case StripeToken::CHARGE:
-                $refund = \Stripe\Refund::create([
-                    'charge' => $token->value,
-                    'amount' => $amount,
-                    'reason' => $reason,
-                    'metadata' => $metadata,
-                ]);
+            default:
+                $chargeId = $token->value;
 
                 break;
         }
+
+        $refund = \Stripe\Refund::create([
+            'charge' => $chargeId,
+            'amount' => $amount,
+            'reason' => $reason,
+            'metadata' => $metadata,
+        ]);
 
         return new Refund($refund->id);
     }
