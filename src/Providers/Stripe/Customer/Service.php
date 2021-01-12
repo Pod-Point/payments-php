@@ -97,9 +97,9 @@ class Service implements CustomerServiceInterface
             case StripeToken::TOKEN:
             default:
                 /** @var StripeCustomer $stripeCustomer */
-                $stripeCustomer = StripeCustomer::retrieve($customerUid);
+                $customerSources = StripeCustomer::allSources($customerUid);
 
-                $response = $stripeCustomer->sources->create([
+                $response = $customerSources->create([
                     'source' => $cardUid,
                 ]);
 
