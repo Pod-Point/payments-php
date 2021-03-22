@@ -160,4 +160,40 @@ class ServiceTest extends TestCase
 
         $this->assertEquals($paymentIntent->type, Token::PAYMENT_INTENT);
     }
+
+    /**
+     * Tests that a pre authorised payment can be created successfully with a payment method.
+     */
+    public function testPreAuthorise()
+    {
+        $paymentMethodToken = new Token('pm_card_visa');
+
+        $payment = $this->service->reserve(
+            $paymentMethodToken,
+            1000
+        );
+
+        $this->assertInstanceOf(Payment::class, $payment);
+
+        $paymentToken = new Token($payment->uid);
+
+        $this->assertEquals( Token::PAYMENT_INTENT, $paymentToken->type);
+    }
+
+    /**
+     * Tests that a pre authorised payment which requires confirmation can be created successfully with a payment method.
+     */
+    public function testPreAuthorisePaymentIntentConfirmation()
+    {
+        $paymentMethodToken = new Token('pm_card_authenticationRequiredOnSetup');
+
+        try {
+            $this->service->reserve(
+                $paymentMethodToken,
+                1000
+            );
+        } catch (StripeException $exception) {
+            $this->assertEquals(Token::SECRET_PAYMENT_INTENT, $exception->getToken()->type);
+        }
+    }
 }

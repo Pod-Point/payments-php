@@ -4,6 +4,7 @@ namespace PodPoint\Payments\Payment;
 
 use PodPoint\Payments\Payment;
 use PodPoint\Payments\Customer\Service as CustomerService;
+use PodPoint\Payments\Providers\Stripe\Payment\Exception;
 use PodPoint\Payments\Refund\Service as RefundService;
 use PodPoint\Payments\Card\Service as CardService;
 use PodPoint\Payments\Token;
@@ -19,6 +20,7 @@ interface Service
      * @param string|null $description
      * @param array $metadata
      * @param string|null $customerUid
+     * @param array $params
      *
      * @return Payment
      */
@@ -28,7 +30,27 @@ interface Service
         string $currency = 'GBP',
         string $description = null,
         array $metadata = [],
-        string $customerUid = null
+        string $customerUid = null,
+        array $params = []
+    ): Payment;
+
+    /**
+     * Tries to reserve funds.
+     *
+     * @param Token $token
+     * @param int $amount
+     * @param string $currency
+     * @param array $params
+     *
+     * @return Payment
+     *
+     * @throws Exception|\Stripe\Error\Api
+     */
+    public function reserve(
+        Token $token,
+        int $amount,
+        string $currency = 'GBP',
+        array $params = []
     ): Payment;
 
     /**
