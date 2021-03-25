@@ -13,7 +13,6 @@ class Token extends \PodPoint\Payments\Token
     const SECRET_SETUP_INTENT = 'secret_setup_intent';
     const CARD = 'card';
     const CHARGE = 'charge';
-    const SETUP = 'setup';
 
     /**
      * @param string $value

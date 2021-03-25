@@ -48,7 +48,8 @@ class Service implements ServiceInterface
         string $currency = 'GBP',
         string $description = null,
         array $metadata = [],
-        string $customerUid = null
+        string $customerUid = null,
+        array $params = []
     ): Payment {
         switch ($token->type) {
             case StripeToken::CUSTOMER:
@@ -79,40 +80,79 @@ class Service implements ServiceInterface
             case StripeToken::PAYMENT_METHOD:
             case StripeToken::CARD:
                 /** @var PaymentIntent $response */
-                $response = PaymentIntent::create([
-                    'payment_method' => $token->value,
-                    'customer' => $customerUid,
-                    'amount' => $amount,
-                    'currency' => $currency,
-                    'confirmation_method' => 'manual',
-                    'confirm' => true,
-                    'payment_method_types' => ['card'],
-                    'description' => $description,
-                    'metadata' => $metadata,
-                    'use_stripe_sdk' => true,
-                ]);
+                $response = PaymentIntent::create(array_merge(
+                    [
+                        'payment_method' => $token->value,
+                        'customer' => $customerUid,
+                        'amount' => $amount,
+                        'currency' => $currency,
+                        'confirmation_method' => 'manual',
+                        'confirm' => true,
+                        'payment_method_types' => ['card'],
+                        'description' => $description,
+                        'metadata' => $metadata,
+                        'use_stripe_sdk' => true,
+                    ],
+                    $params
+                ));
 
                 break;
             case StripeToken::CHARGE:
             default:
                 /** @var Charge $response */
                 $response = Charge::create([
-                    'amount'      => $amount,
-                    'currency'    => $currency,
-                    'source'      => $token->value,
-                    'metadata'    => $metadata
+                    'amount' => $amount,
+                    'currency' => $currency,
+                    'source' => $token->value,
+                    'metadata' => $metadata,
                 ]);
 
                 break;
         }
 
-        if ($response instanceof PaymentIntent && $response->status !== PaymentIntent::STATUS_SUCCEEDED) {
-            $token = new StripeToken($response->client_secret);
+        if ($response instanceof PaymentIntent) {
+            $requiresCapture = $response->status === PaymentIntent::STATUS_REQUIRES_CAPTURE;
+            $succeeded = $response->status !== PaymentIntent::STATUS_SUCCEEDED;
 
-            throw new StripeException($token);
+            if (!$requiresCapture && $succeeded) {
+                $token = new StripeToken($response->client_secret);
+
+                throw new StripeException($token);
+            }
         }
 
         return new Payment($response->id, $response->amount, $response->currency, $response->created);
+    }
+
+    /**
+     * Tries to reserve funds on a payment method using the Stripe SDK.
+     *
+     * @param Token $token
+     * @param int $amount
+     * @param string $currency
+     * @param array $params
+     *
+     * @return Payment
+     *
+     * @throws Exception|\Stripe\Error\Api
+     */
+    public function reserve(
+        Token $token,
+        int $amount,
+        string $currency = 'GBP',
+        array $params = []
+    ): Payment {
+        $params['capture_method'] = 'manual';
+
+        return $this->create(
+          $token,
+          $amount,
+          $currency,
+          $params['description'] ?? null,
+          $params['metadata'] ?? [],
+          $params['customer'] ?? null,
+          $params
+        );
     }
 
     /**
