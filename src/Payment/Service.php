@@ -2,12 +2,15 @@
 
 namespace PodPoint\Payments\Payment;
 
+use PodPoint\Payments\Exceptions\InvalidToken;
 use PodPoint\Payments\Payment;
 use PodPoint\Payments\Customer\Service as CustomerService;
+use PodPoint\Payments\Providers\Stripe\Payment\AmountTooLarge;
 use PodPoint\Payments\Providers\Stripe\Payment\Exception;
 use PodPoint\Payments\Refund\Service as RefundService;
 use PodPoint\Payments\Card\Service as CardService;
 use PodPoint\Payments\Token;
+use Stripe\Error\InvalidRequest;
 
 interface Service
 {
@@ -52,6 +55,20 @@ interface Service
         string $currency = 'GBP',
         array $params = []
     ): Payment;
+
+    /**
+     * Tries to capture reserved funds.
+     *
+     * @param Token $token
+     * @param int $amount
+     *
+     * @return Payment
+     *
+     * @throws AmountTooLarge
+     * @throws InvalidRequest
+     * @throws InvalidToken
+     */
+    public function capture(Token $token, int $amount): Payment;
 
     /**
      * Returns card service.
