@@ -4,16 +4,18 @@ namespace PodPoint\Payments\Providers\Stripe\Payment;
 
 class AmountTooLarge extends \Exception
 {
-    public $amountCapturable;
+    /**
+     * @var int
+     */
+    public $capturableAmount;
 
     /**
-     * @param int $amountCapturable
-     * @param \Throwable|null $previous
+     * @param int $capturableAmount
      */
-    public function __construct(int $amountCapturable, \Throwable $previous = null)
+    public function __construct(int $capturableAmount)
     {
-        parent::__construct('Failed to create payment due to Stripe API response.', 1, $previous);
+        parent::__construct('Failed to create payment due to Stripe API response.');
 
-        $this->amountCapturable = $amountCapturable;
+        $this->capturableAmount = $capturableAmount;
     }
 }
