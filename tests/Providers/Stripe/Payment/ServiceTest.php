@@ -2,7 +2,9 @@
 
 namespace PodPoint\Payments\Tests\Providers\Stripe\Payment;
 
+use PodPoint\Payments\Exceptions\InvalidToken;
 use PodPoint\Payments\Payment;
+use PodPoint\Payments\Providers\Stripe\Payment\AmountTooLarge;
 use PodPoint\Payments\Providers\Stripe\Payment\Service;
 use PodPoint\Payments\Providers\Stripe\Token;
 use PodPoint\Payments\Tests\TestCase;
@@ -195,5 +197,68 @@ class ServiceTest extends TestCase
         } catch (StripeException $exception) {
             $this->assertEquals(Token::SECRET_PAYMENT_INTENT, $exception->getToken()->type);
         }
+    }
+
+    /**
+     * Tests reserved funds capture.
+     */
+    public function testFundsCapture()
+    {
+        $paymentMethodToken = new Token('pm_card_visa');
+
+        $reserveAmount = 1000;
+
+        $payment = $this->service->reserve(
+            $paymentMethodToken,
+            $reserveAmount
+        );
+
+        $token = new Token($payment->uid);
+
+        $capturedPayment = $this->service->capture(
+            $token,
+            $reserveAmount
+        );
+
+        $this->assertEquals($reserveAmount, $capturedPayment->amount);
+    }
+
+    /**
+     * Tests that reserved funds can be only captured using payment intent token.
+     */
+    public function testFundsCanBeCapturedOnlyUsingPaymentIntentToken()
+    {
+        $token = new Token('pm_some_other_token');
+
+        $this->expectException(InvalidToken::class);
+
+        $this->service->capture(
+            $token,
+            1000
+        );
+    }
+
+    /**
+     * Tests that AmountTooLarge exeption is thrown if capture amount is higher than reserved funds.
+     */
+    public function testCorrectExceptionIsThrownWhenCaptureAmountIsHigherThanReservedFunds()
+    {
+        $paymentMethodToken = new Token('pm_card_visa');
+
+        $reserveAmount = 1000;
+
+        $payment = $this->service->reserve(
+            $paymentMethodToken,
+            $reserveAmount
+        );
+
+        $token = new Token($payment->uid);
+
+        $this->expectException(AmountTooLarge::class);
+
+        $this->service->capture(
+            $token,
+            $reserveAmount + 500
+        );
     }
 }

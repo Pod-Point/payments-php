@@ -2,6 +2,7 @@
 
 namespace PodPoint\Payments\Providers\Stripe\Payment;
 
+use PodPoint\Payments\Exceptions\InvalidToken;
 use PodPoint\Payments\Payment;
 use PodPoint\Payments\Customer\Service as CustomerServiceInterface;
 use PodPoint\Payments\Refund\Service as RefundServiceInterface;
@@ -14,6 +15,7 @@ use PodPoint\Payments\Payment\Service as ServiceInterface;
 use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
 use PodPoint\Payments\Token;
 use Stripe\Charge;
+use Stripe\Error\InvalidRequest;
 use Stripe\PaymentIntent;
 use Stripe\Stripe;
 
@@ -153,6 +155,41 @@ class Service implements ServiceInterface
           $params['customer'] ?? null,
           $params
         );
+    }
+
+    /**
+     * Tries to capture funds on a payment intent using the Stripe SDK.
+     *
+     * @param Token $token
+     * @param int $amount
+     *
+     * @return Payment
+     *
+     * @throws AmountTooLarge
+     * @throws InvalidRequest
+     * @throws InvalidToken
+     */
+    public function capture(Token $token, int $amount): Payment
+    {
+        if ($token->type === StripeToken::PAYMENT_INTENT) {
+            $intent = PaymentIntent::retrieve($token->value);
+
+            try {
+                $response = $intent->capture([
+                    'amount_to_capture' => $amount,
+                ]);
+
+                return new Payment($response->id, $response->amount, $response->currency, $response->created);
+            } catch (InvalidRequest $exception) {
+                if ($exception->getStripeCode() === 'amount_too_large') {
+                   throw new AmountTooLarge($intent->amount_capturable);
+                }
+
+                throw $exception;
+            }
+        }
+
+        throw new InvalidToken("Provided token type: $token->type is invalid, use " . StripeToken::PAYMENT_INTENT . " type");
     }
 
     /**
