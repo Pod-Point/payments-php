@@ -22,6 +22,27 @@ use Stripe\Stripe;
 class Service implements ServiceInterface
 {
     /**
+     * @var string
+     */
+    const CANCELLATION_DUPLICATE = 'duplicate';
+
+    /**
+     * @var string
+     */
+    const CANCELLATION_FRAUDULENT = 'fraudulent';
+
+    /**
+     * @var string
+     */
+    const CANCELLATION_REQUESTED_BY_CUSTOMER = 'requested_by_customer';
+
+    /**
+     * @var string
+     */
+    const CANCELLATION_ABANDONED = 'abandoned';
+
+
+    /**
      * @param string $key
      */
     public function __construct(string $key)
@@ -127,6 +148,7 @@ class Service implements ServiceInterface
     }
 
     /**
+<<<<<<< Updated upstream
      * Tries to reserve funds on a payment method using the Stripe SDK.
      *
      * @param Token $token
@@ -182,11 +204,36 @@ class Service implements ServiceInterface
                 return new Payment($response->id, $response->amount, $response->currency, $response->created);
             } catch (InvalidRequest $exception) {
                 if ($exception->getStripeCode() === 'amount_too_large') {
-                   throw new AmountTooLarge($intent->amount_capturable);
+                    throw new AmountTooLarge($intent->amount_capturable);
                 }
 
                 throw $exception;
             }
+        }
+
+        throw new InvalidToken("Provided token type: $token->type is invalid, use " . StripeToken::PAYMENT_INTENT . " type");
+    }
+
+    /**
+     * Tries to cancel a payment.
+     *
+     * @param Token $token
+     * @param string $reason
+     *
+     * @return Payment
+     *
+     * @throws InvalidToken
+     */
+    public function cancel(Token $token, string $reason): Payment
+    {
+        if ($token->type === StripeToken::PAYMENT_INTENT) {
+            $intent = PaymentIntent::retrieve($token->value);
+
+            $response = $intent->cancel([
+                'cancellation_reason' => $reason,
+            ]);
+
+            return new Payment($response->id, $response->amount, $response->currency, $response->created);
         }
 
         throw new InvalidToken("Provided token type: $token->type is invalid, use " . StripeToken::PAYMENT_INTENT . " type");

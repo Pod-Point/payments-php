@@ -71,6 +71,16 @@ interface Service
     public function capture(Token $token, int $amount): Payment;
 
     /**
+     * Tries to cancel a payment.
+     *
+     * @param Token $token
+     * @param string $reason
+     *
+     * @return Payment
+     */
+    public function cancel(Token $token, string $reason): Payment;
+
+    /**
      * Returns card service.
      *
      * @return CardService

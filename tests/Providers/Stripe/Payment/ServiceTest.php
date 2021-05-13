@@ -261,4 +261,16 @@ class ServiceTest extends TestCase
             $reserveAmount + 500
         );
     }
+
+    /**
+     * Tests that payment intent can be cancelled.
+     */
+    public function testPaymentIntentCanBeCancelled()
+    {
+        $paymentIntentToken = new Token('pi_payment_intent');
+
+        $payment = $this->service->cancel($paymentIntentToken, Service::CANCELLATION_ABANDONED);
+
+        dd($payment);
+    }
 }
