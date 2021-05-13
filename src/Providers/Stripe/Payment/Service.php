@@ -41,7 +41,6 @@ class Service implements ServiceInterface
      */
     const CANCELLATION_ABANDONED = 'abandoned';
 
-
     /**
      * @param string $key
      */
