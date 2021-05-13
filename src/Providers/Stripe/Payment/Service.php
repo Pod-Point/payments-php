@@ -148,7 +148,6 @@ class Service implements ServiceInterface
     }
 
     /**
-<<<<<<< Updated upstream
      * Tries to reserve funds on a payment method using the Stripe SDK.
      *
      * @param Token $token
@@ -169,13 +168,13 @@ class Service implements ServiceInterface
         $params['capture_method'] = 'manual';
 
         return $this->create(
-          $token,
-          $amount,
-          $currency,
-          $params['description'] ?? null,
-          $params['metadata'] ?? [],
-          $params['customer'] ?? null,
-          $params
+            $token,
+            $amount,
+            $currency,
+            $params['description'] ?? null,
+            $params['metadata'] ?? [],
+            $params['customer'] ?? null,
+            $params
         );
     }
 
