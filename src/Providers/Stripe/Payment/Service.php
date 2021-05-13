@@ -210,7 +210,9 @@ class Service implements ServiceInterface
             }
         }
 
-        throw new InvalidToken("Provided token type: $token->type is invalid, use " . StripeToken::PAYMENT_INTENT . " type");
+        throw new InvalidToken(
+            "Provided token type: $token->type is invalid, use " . StripeToken::PAYMENT_INTENT . " type"
+        );
     }
 
     /**
@@ -235,7 +237,9 @@ class Service implements ServiceInterface
             return new Payment($response->id, $response->amount, $response->currency, $response->created);
         }
 
-        throw new InvalidToken("Provided token type: $token->type is invalid, use " . StripeToken::PAYMENT_INTENT . " type");
+        throw new InvalidToken(
+            "Provided token type: $token->type is invalid, use " . StripeToken::PAYMENT_INTENT . " type"
+        );
     }
 
     /**

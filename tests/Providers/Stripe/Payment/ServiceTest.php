@@ -263,9 +263,40 @@ class ServiceTest extends TestCase
     }
 
     /**
-     * Tests that payment intent can be cancelled.
+     * Data provider of testPaymentIntentCanBeCancelled.
+     *
+     * @return array
      */
-    public function testPaymentIntentCanBeCancelled()
+    public function getCancelPaymentIntentData(): array
+    {
+        return [
+            'abandoned' => [
+                Service::CANCELLATION_ABANDONED,
+            ],
+            'duplicate' => [
+                Service::CANCELLATION_DUPLICATE,
+            ],
+            'fraudulent' => [
+                Service::CANCELLATION_FRAUDULENT,
+            ],
+            'requested by customer' => [
+                Service::CANCELLATION_REQUESTED_BY_CUSTOMER,
+            ],
+        ];
+    }
+
+    /**
+     * Tests that payment intent can be cancelled.
+     *
+     * @param string $reason
+     *
+     * @dataProvider getCancelPaymentIntentData
+     *
+     * @throws InvalidToken
+     * @throws StripeException
+     * @throws \Stripe\Error\Api
+     */
+    public function testPaymentIntentCanBeCancelled(string $reason)
     {
         $amount = 1000;
         $paymentMethodToken = new Token('pm_card_visa');
@@ -277,20 +308,24 @@ class ServiceTest extends TestCase
 
         $paymentIntentToken = new Token($payment->uid);
 
-        $cancelledPayment = $this->service->cancel($paymentIntentToken, Service::CANCELLATION_ABANDONED);
+        $cancelledPayment = $this->service->cancel($paymentIntentToken, $reason);
 
         $this->assertEquals($amount, $cancelledPayment->amount);
     }
 
     /**
      * Tests that reserved fund can only be cancelled using payment intent token.
+     *
+     * @param string $reason
+     *
+     * @dataProvider getCancelPaymentIntentData
      */
-    public function testFundsCanBeOnlyCancelledWithPaymentIntentToken()
+    public function testFundsCanBeOnlyCancelledWithPaymentIntentToken(string $reason)
     {
         $token = new Token('pm_some_other_token');
 
         $this->expectException(InvalidToken::class);
 
-        $this->service->cancel($token, Service::CANCELLATION_ABANDONED);
+        $this->service->cancel($token, $reason);
     }
 }
