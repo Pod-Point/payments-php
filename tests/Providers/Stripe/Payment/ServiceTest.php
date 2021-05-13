@@ -267,10 +267,30 @@ class ServiceTest extends TestCase
      */
     public function testPaymentIntentCanBeCancelled()
     {
-        $paymentIntentToken = new Token('pi_payment_intent');
+        $amount = 1000;
+        $paymentMethodToken = new Token('pm_card_visa');
 
-        $payment = $this->service->cancel($paymentIntentToken, Service::CANCELLATION_ABANDONED);
+        $payment = $this->service->reserve(
+            $paymentMethodToken,
+            $amount
+        );
 
-        dd($payment);
+        $paymentIntentToken = new Token($payment->uid);
+
+        $cancelledPayment = $this->service->cancel($paymentIntentToken, Service::CANCELLATION_ABANDONED);
+
+        $this->assertEquals($amount, $cancelledPayment->amount);
+    }
+
+    /**
+     * Tests that reserved fund can only be cancelled using payment intent token.
+     */
+    public function testFundsCanBeOnlyCancelledWithPaymentIntentToken()
+    {
+        $token = new Token('pm_some_other_token');
+
+        $this->expectException(InvalidToken::class);
+
+        $this->service->cancel($token, Service::CANCELLATION_ABANDONED);
     }
 }
