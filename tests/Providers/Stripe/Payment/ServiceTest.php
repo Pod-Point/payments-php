@@ -4,13 +4,13 @@ namespace PodPoint\Payments\Tests\Providers\Stripe\Payment;
 
 use PodPoint\Payments\Exceptions\InvalidToken;
 use PodPoint\Payments\Payment;
+use PodPoint\Payments\Providers\Stripe\Customer\Service as CustomerService;
 use PodPoint\Payments\Providers\Stripe\Payment\AmountTooLarge;
+use PodPoint\Payments\Providers\Stripe\Payment\Exception as StripeException;
 use PodPoint\Payments\Providers\Stripe\Payment\Service;
+use PodPoint\Payments\Providers\Stripe\Refund\Service as RefundService;
 use PodPoint\Payments\Providers\Stripe\Token;
 use PodPoint\Payments\Tests\TestCase;
-use PodPoint\Payments\Providers\Stripe\Payment\Exception as StripeException;
-use PodPoint\Payments\Providers\Stripe\Customer\Service as CustomerService;
-use PodPoint\Payments\Providers\Stripe\Refund\Service as RefundService;
 
 class ServiceTest extends TestCase
 {
@@ -263,40 +263,13 @@ class ServiceTest extends TestCase
     }
 
     /**
-     * Data provider of testPaymentIntentCanBeCancelled.
-     *
-     * @return array
-     */
-    public function getCancelPaymentIntentData(): array
-    {
-        return [
-            'abandoned' => [
-                Service::CANCELLATION_ABANDONED,
-            ],
-            'duplicate' => [
-                Service::CANCELLATION_DUPLICATE,
-            ],
-            'fraudulent' => [
-                Service::CANCELLATION_FRAUDULENT,
-            ],
-            'requested by customer' => [
-                Service::CANCELLATION_REQUESTED_BY_CUSTOMER,
-            ],
-        ];
-    }
-
-    /**
      * Tests that payment intent can be cancelled.
-     *
-     * @param string $reason
-     *
-     * @dataProvider getCancelPaymentIntentData
      *
      * @throws InvalidToken
      * @throws StripeException
      * @throws \Stripe\Error\Api
      */
-    public function testPaymentIntentCanBeCancelled(string $reason)
+    public function testPaymentIntentCanBeCancelled()
     {
         $amount = 1000;
         $paymentMethodToken = new Token('pm_card_visa');
@@ -308,24 +281,20 @@ class ServiceTest extends TestCase
 
         $paymentIntentToken = new Token($payment->uid);
 
-        $cancelledPayment = $this->service->cancel($paymentIntentToken, $reason);
+        $cancelledPayment = $this->service->cancel($paymentIntentToken);
 
         $this->assertEquals($amount, $cancelledPayment->amount);
     }
 
     /**
      * Tests that reserved fund can only be cancelled using payment intent token.
-     *
-     * @param string $reason
-     *
-     * @dataProvider getCancelPaymentIntentData
      */
-    public function testFundsCanBeOnlyCancelledWithPaymentIntentToken(string $reason)
+    public function testFundsCanBeOnlyCancelledWithPaymentIntentToken()
     {
         $token = new Token('pm_some_other_token');
 
         $this->expectException(InvalidToken::class);
 
-        $this->service->cancel($token, $reason);
+        $this->service->cancel($token);
     }
 }

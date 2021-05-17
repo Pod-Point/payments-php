@@ -2,13 +2,13 @@
 
 namespace PodPoint\Payments\Payment;
 
+use PodPoint\Payments\Card\Service as CardService;
+use PodPoint\Payments\Customer\Service as CustomerService;
 use PodPoint\Payments\Exceptions\InvalidToken;
 use PodPoint\Payments\Payment;
-use PodPoint\Payments\Customer\Service as CustomerService;
 use PodPoint\Payments\Providers\Stripe\Payment\AmountTooLarge;
 use PodPoint\Payments\Providers\Stripe\Payment\Exception;
 use PodPoint\Payments\Refund\Service as RefundService;
-use PodPoint\Payments\Card\Service as CardService;
 use PodPoint\Payments\Token;
 use Stripe\Error\InvalidRequest;
 
@@ -74,11 +74,10 @@ interface Service
      * Tries to cancel a payment.
      *
      * @param Token $token
-     * @param string $reason
      *
      * @return Payment
      */
-    public function cancel(Token $token, string $reason): Payment;
+    public function cancel(Token $token): Payment;
 
     /**
      * Returns card service.
