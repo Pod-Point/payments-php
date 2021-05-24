@@ -2,17 +2,17 @@
 
 namespace PodPoint\Payments\Providers\Stripe\Payment;
 
+use PodPoint\Payments\Card\Service as CardServiceInterface;
+use PodPoint\Payments\Customer\Service as CustomerServiceInterface;
 use PodPoint\Payments\Exceptions\InvalidToken;
 use PodPoint\Payments\Payment;
-use PodPoint\Payments\Customer\Service as CustomerServiceInterface;
-use PodPoint\Payments\Refund\Service as RefundServiceInterface;
-use PodPoint\Payments\Card\Service as CardServiceInterface;
+use PodPoint\Payments\Payment\Service as ServiceInterface;
 use PodPoint\Payments\Providers\Stripe\Card\Service as CardService;
 use PodPoint\Payments\Providers\Stripe\Customer\Service as CustomerService;
-use PodPoint\Payments\Providers\Stripe\Refund\Service as RefundService;
 use PodPoint\Payments\Providers\Stripe\Payment\Exception as StripeException;
-use PodPoint\Payments\Payment\Service as ServiceInterface;
+use PodPoint\Payments\Providers\Stripe\Refund\Service as RefundService;
 use PodPoint\Payments\Providers\Stripe\Token as StripeToken;
+use PodPoint\Payments\Refund\Service as RefundServiceInterface;
 use PodPoint\Payments\Token;
 use Stripe\Charge;
 use Stripe\Error\InvalidRequest;
@@ -21,6 +21,11 @@ use Stripe\Stripe;
 
 class Service implements ServiceInterface
 {
+    /**
+     * @var string
+     */
+    const CANCELLATION_ABANDONED = 'abandoned';
+
     /**
      * @param string $key
      */
@@ -147,13 +152,13 @@ class Service implements ServiceInterface
         $params['capture_method'] = 'manual';
 
         return $this->create(
-          $token,
-          $amount,
-          $currency,
-          $params['description'] ?? null,
-          $params['metadata'] ?? [],
-          $params['customer'] ?? null,
-          $params
+            $token,
+            $amount,
+            $currency,
+            $params['description'] ?? null,
+            $params['metadata'] ?? [],
+            $params['customer'] ?? null,
+            $params
         );
     }
 
@@ -182,14 +187,42 @@ class Service implements ServiceInterface
                 return new Payment($response->id, $response->amount, $response->currency, $response->created);
             } catch (InvalidRequest $exception) {
                 if ($exception->getStripeCode() === 'amount_too_large') {
-                   throw new AmountTooLarge($intent->amount_capturable);
+                    throw new AmountTooLarge($intent->amount_capturable);
                 }
 
                 throw $exception;
             }
         }
 
-        throw new InvalidToken("Provided token type: $token->type is invalid, use " . StripeToken::PAYMENT_INTENT . " type");
+        throw new InvalidToken(
+            "Provided token type: $token->type is invalid, use " . StripeToken::PAYMENT_INTENT . " type"
+        );
+    }
+
+    /**
+     * Tries to cancel a payment.
+     *
+     * @param Token $token
+     *
+     * @return Payment
+     *
+     * @throws InvalidToken
+     */
+    public function cancel(Token $token): Payment
+    {
+        if ($token->type === StripeToken::PAYMENT_INTENT) {
+            $intent = PaymentIntent::retrieve($token->value);
+
+            $response = $intent->cancel([
+                'cancellation_reason' => self::CANCELLATION_ABANDONED,
+            ]);
+
+            return new Payment($response->id, $response->amount, $response->currency, $response->created);
+        }
+
+        throw new InvalidToken(
+            "Provided token type: $token->type is invalid, use " . StripeToken::PAYMENT_INTENT . " type"
+        );
     }
 
     /**

@@ -4,13 +4,13 @@ namespace PodPoint\Payments\Tests\Providers\Stripe\Payment;
 
 use PodPoint\Payments\Exceptions\InvalidToken;
 use PodPoint\Payments\Payment;
+use PodPoint\Payments\Providers\Stripe\Customer\Service as CustomerService;
 use PodPoint\Payments\Providers\Stripe\Payment\AmountTooLarge;
+use PodPoint\Payments\Providers\Stripe\Payment\Exception as StripeException;
 use PodPoint\Payments\Providers\Stripe\Payment\Service;
+use PodPoint\Payments\Providers\Stripe\Refund\Service as RefundService;
 use PodPoint\Payments\Providers\Stripe\Token;
 use PodPoint\Payments\Tests\TestCase;
-use PodPoint\Payments\Providers\Stripe\Payment\Exception as StripeException;
-use PodPoint\Payments\Providers\Stripe\Customer\Service as CustomerService;
-use PodPoint\Payments\Providers\Stripe\Refund\Service as RefundService;
 
 class ServiceTest extends TestCase
 {
@@ -260,5 +260,41 @@ class ServiceTest extends TestCase
             $token,
             $reserveAmount + 500
         );
+    }
+
+    /**
+     * Tests that payment intent can be cancelled.
+     *
+     * @throws InvalidToken
+     * @throws StripeException
+     * @throws \Stripe\Error\Api
+     */
+    public function testPaymentIntentCanBeCancelled()
+    {
+        $amount = 1000;
+        $paymentMethodToken = new Token('pm_card_visa');
+
+        $payment = $this->service->reserve(
+            $paymentMethodToken,
+            $amount
+        );
+
+        $paymentIntentToken = new Token($payment->uid);
+
+        $cancelledPayment = $this->service->cancel($paymentIntentToken);
+
+        $this->assertEquals($amount, $cancelledPayment->amount);
+    }
+
+    /**
+     * Tests that reserved fund can only be cancelled using payment intent token.
+     */
+    public function testFundsCanBeOnlyCancelledWithPaymentIntentToken()
+    {
+        $token = new Token('pm_some_other_token');
+
+        $this->expectException(InvalidToken::class);
+
+        $this->service->cancel($token);
     }
 }
