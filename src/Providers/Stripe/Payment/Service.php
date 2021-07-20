@@ -108,8 +108,8 @@ class Service implements ServiceInterface
                         'currency' => $currency,
                         'payment_method' => $token->value,
                         'confirmation_method' => 'manual',
-                        "capture_method" => "manual",
-                        "confirm" => true
+                        'capture_method' => 'manual',
+                        'confirm' => true
                     ];
                 }
 
