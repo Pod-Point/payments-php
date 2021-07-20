@@ -43,6 +43,8 @@ class Service implements ServiceInterface
      * @param string|null $description
      * @param array $metadata
      * @param string|null $customerUid
+     * @param array $params
+     * @param bool $isReserve
      *
      * @return Payment
      *
@@ -56,7 +58,8 @@ class Service implements ServiceInterface
         string $description = null,
         array $metadata = [],
         string $customerUid = null,
-        array $params = []
+        array $params = [],
+        bool $isReserve = false
     ): Payment {
         switch ($token->type) {
             case StripeToken::CUSTOMER:
@@ -86,22 +89,32 @@ class Service implements ServiceInterface
                 break;
             case StripeToken::PAYMENT_METHOD:
             case StripeToken::CARD:
-                /** @var PaymentIntent $response */
-                $response = PaymentIntent::create(array_merge(
-                    [
-                        'payment_method' => $token->value,
-                        'customer' => $customerUid,
+                $parameters = [
+                    'payment_method' => $token->value,
+                    'customer' => $customerUid,
+                    'amount' => $amount,
+                    'currency' => $currency,
+                    'confirmation_method' => 'manual',
+                    'confirm' => true,
+                    'payment_method_types' => ['card'],
+                    'description' => $description,
+                    'metadata' => $metadata,
+                    'use_stripe_sdk' => true,
+                ];
+
+                if ($isReserve) {
+                    $parameters = [
                         'amount' => $amount,
                         'currency' => $currency,
+                        'payment_method' => $token->value,
                         'confirmation_method' => 'manual',
-                        'confirm' => true,
-                        'payment_method_types' => ['card'],
-                        'description' => $description,
-                        'metadata' => $metadata,
-                        'use_stripe_sdk' => true,
-                    ],
-                    $params
-                ));
+                        "capture_method" => "manual",
+                        "confirm" => true
+                    ];
+                }
+
+                /** @var PaymentIntent $response */
+                $response = PaymentIntent::create(array_merge($parameters, $params));
 
                 break;
             case StripeToken::CHARGE:
@@ -149,8 +162,6 @@ class Service implements ServiceInterface
         string $currency = 'GBP',
         array $params = []
     ): Payment {
-        $params['capture_method'] = 'manual';
-
         return $this->create(
             $token,
             $amount,
@@ -158,7 +169,8 @@ class Service implements ServiceInterface
             $params['description'] ?? null,
             $params['metadata'] ?? [],
             $params['customer'] ?? null,
-            $params
+            $params,
+            true
         );
     }
 
