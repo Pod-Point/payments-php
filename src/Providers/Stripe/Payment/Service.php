@@ -43,6 +43,7 @@ class Service implements ServiceInterface
      * @param string|null $description
      * @param array $metadata
      * @param string|null $customerUid
+     * @param bool $isOffline
      *
      * @return Payment
      *
@@ -56,15 +57,15 @@ class Service implements ServiceInterface
         string $description = null,
         array $metadata = [],
         string $customerUid = null,
-        array $params = []
+        array $params = [],
+        bool $isOffline = false
     ): Payment {
         switch ($token->type) {
             case StripeToken::CUSTOMER:
                 $cards = $this->customers()->getCards($token->value);
                 $card = $cards[0];
 
-                /** @var PaymentIntent $response */
-                $response = PaymentIntent::create([
+                $parameters = [
                     'payment_method' => $card->uid,
                     'customer' => $token->value,
                     'amount' => $amount,
@@ -75,7 +76,24 @@ class Service implements ServiceInterface
                     'description' => $description,
                     'metadata' => $metadata,
                     'use_stripe_sdk' => true,
-                ]);
+                ];
+
+                if ($isOffline) {
+                    $parameters = [
+                        'payment_method' => $card->uid,
+                        'customer' => $token->value,
+                        'amount' => $amount,
+                        'currency' => $currency,
+                        'off_session' => true,
+                        'confirm' => true,
+                        'payment_method_types' => ['card'],
+                        'description' => $description,
+                        'metadata' => $metadata,
+                    ];
+                }
+
+
+                $response = PaymentIntent::create($parameters);
 
                 break;
             case StripeToken::PAYMENT_INTENT:
