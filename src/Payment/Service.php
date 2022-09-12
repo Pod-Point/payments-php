@@ -24,6 +24,7 @@ interface Service
      * @param array $metadata
      * @param string|null $customerUid
      * @param array $params
+     * @param bool $isOffline
      *
      * @return Payment
      */
@@ -34,7 +35,8 @@ interface Service
         string $description = null,
         array $metadata = [],
         string $customerUid = null,
-        array $params = []
+        array $params = [],
+        bool $isOffline = false
     ): Payment;
 
     /**
