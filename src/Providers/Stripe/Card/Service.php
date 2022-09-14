@@ -53,7 +53,7 @@ class Service implements ServiceInterface
         } else {
             /** @var SetupIntent $response */
             $response = SetupIntent::create([
-                'usage' => 'on_session',
+                'usage' => 'off_session',
                 'payment_method_types' => ['card'],
             ]);
         }
