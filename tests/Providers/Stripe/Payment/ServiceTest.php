@@ -256,10 +256,21 @@ class ServiceTest extends TestCase
 
         $this->expectException(AmountTooLarge::class);
 
-        $this->service->capture(
-            $token,
-            $reserveAmount + 500
-        );
+        $expectedError = null;
+
+        $intendedAmount = $reserveAmount + 500;
+        try {
+            $this->service->capture(
+                $token,
+                $intendedAmount
+            );
+        } catch (AmountTooLarge $err) {
+            $expectedError = $err;
+        }
+
+        $this->assertNotNull($expectedError);
+        $this->assertEquals($reserveAmount, $expectedError->capturableAmount);
+        $this->assertEquals($intendedAmount, $expectedError->intendedAmount);
     }
 
     /**

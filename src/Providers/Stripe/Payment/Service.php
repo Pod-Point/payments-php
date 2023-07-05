@@ -187,7 +187,7 @@ class Service implements ServiceInterface
                 return new Payment($response->id, $response->amount, $response->currency, $response->created);
             } catch (InvalidRequest $exception) {
                 if ($exception->getStripeCode() === 'amount_too_large') {
-                    throw new AmountTooLarge($intent->amount_capturable);
+                    throw new AmountTooLarge($intent->amount, $intent->amount_capturable);
                 }
 
                 throw $exception;
