@@ -15,8 +15,8 @@ class AmountTooLarge extends \Exception
     public $capturableAmount;
 
     /**
-     * @param int $capturableAmount
      * @param int $intendedAmount
+     * @param int $capturableAmount
      */
     public function __construct(int $intendedAmount, int $capturableAmount)
     {
