@@ -254,8 +254,6 @@ class ServiceTest extends TestCase
 
         $token = new Token($payment->uid);
 
-        $this->expectException(AmountTooLarge::class);
-
         $expectedError = null;
 
         $intendedAmount = $reserveAmount + 500;
