@@ -6,11 +6,13 @@ use PodPoint\Payments\Exceptions\InvalidToken;
 use PodPoint\Payments\Payment;
 use PodPoint\Payments\Providers\Stripe\Customer\Service as CustomerService;
 use PodPoint\Payments\Providers\Stripe\Payment\AmountTooLarge;
+use PodPoint\Payments\Providers\Stripe\Payment\Canceled;
 use PodPoint\Payments\Providers\Stripe\Payment\Exception as StripeException;
 use PodPoint\Payments\Providers\Stripe\Payment\Service;
 use PodPoint\Payments\Providers\Stripe\Refund\Service as RefundService;
 use PodPoint\Payments\Providers\Stripe\Token;
 use PodPoint\Payments\Tests\TestCase;
+use Stripe\PaymentIntent;
 
 class ServiceTest extends TestCase
 {
@@ -271,19 +273,20 @@ class ServiceTest extends TestCase
      */
     public function testPaymentIntentCanBeCancelled()
     {
-        $amount = 1000;
-        $paymentMethodToken = new Token('pm_card_visa');
+        $mockPaymentIntent = new PaymentIntent();
+        $mockPaymentIntent->status = 'canceled';
+        $mockService = $this->getMockBuilder(Service::class)
+            ->setMethodsExcept(['capture'])
+            ->disableOriginalConstructor()->getMock();
+        $mockService->expects($this->once())
+        ->method('retrievePaymentIntent')
+        ->willReturn($mockPaymentIntent);
+        $mockToken = new Token('some-uid');
+        $mockToken->type = Token::PAYMENT_INTENT;
+        $mockAmount = 20;
 
-        $payment = $this->service->reserve(
-            $paymentMethodToken,
-            $amount
-        );
-
-        $paymentIntentToken = new Token($payment->uid);
-
-        $cancelledPayment = $this->service->cancel($paymentIntentToken);
-
-        $this->assertEquals($amount, $cancelledPayment->amount);
+        $this->expectException(Canceled::class);
+        $mockService->capture($mockToken, $mockAmount);
     }
 
     /**

@@ -162,6 +162,11 @@ class Service implements ServiceInterface
         );
     }
 
+    public function retrievePaymentIntent(string $token): PaymentIntent
+    {
+        return PaymentIntent::retrieve($token);
+    }
+
     /**
      * Tries to capture funds on a payment intent using the Stripe SDK.
      *
@@ -171,13 +176,17 @@ class Service implements ServiceInterface
      * @return Payment
      *
      * @throws AmountTooLarge
+     * @throws Canceled
      * @throws InvalidRequest
      * @throws InvalidToken
      */
     public function capture(Token $token, int $amount): Payment
     {
         if ($token->type === StripeToken::PAYMENT_INTENT) {
-            $intent = PaymentIntent::retrieve($token->value);
+            $intent = $this->retrievePaymentIntent($token->value);
+            if ($intent->status == 'canceled') {
+                throw new Canceled();
+            }
 
             try {
                 $response = $intent->capture([
