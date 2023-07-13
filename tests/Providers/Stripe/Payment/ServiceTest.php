@@ -275,18 +275,21 @@ class ServiceTest extends TestCase
     {
         $mockPaymentIntent = new PaymentIntent();
         $mockPaymentIntent->status = 'canceled';
+
         $mockService = $this->getMockBuilder(Service::class)
             ->setMethodsExcept(['capture'])
-            ->disableOriginalConstructor()->getMock();
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $mockService->expects($this->once())
-        ->method('retrievePaymentIntent')
-        ->willReturn($mockPaymentIntent);
-        $mockToken = new Token('some-uid');
-        $mockToken->type = Token::PAYMENT_INTENT;
-        $mockAmount = 20;
+            ->method('retrievePaymentIntent')
+            ->willReturn($mockPaymentIntent);
 
         $this->expectException(Canceled::class);
-        $mockService->capture($mockToken, $mockAmount);
+
+        $token = new Token('some-uid');
+        $token->type = Token::PAYMENT_INTENT;
+        $mockService->capture($token, 20);
     }
 
     /**
