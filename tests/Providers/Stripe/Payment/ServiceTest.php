@@ -5,6 +5,7 @@ namespace PodPoint\Payments\Tests\Providers\Stripe\Payment;
 use PodPoint\Payments\Exceptions\InvalidToken;
 use PodPoint\Payments\Payment;
 use PodPoint\Payments\Providers\Stripe\Customer\Service as CustomerService;
+use PodPoint\Payments\Providers\Stripe\Payment\AlreadyCanceled;
 use PodPoint\Payments\Providers\Stripe\Payment\AmountTooLarge;
 use PodPoint\Payments\Providers\Stripe\Payment\Canceled;
 use PodPoint\Payments\Providers\Stripe\Payment\Exception as StripeException;
@@ -302,5 +303,33 @@ class ServiceTest extends TestCase
         $this->expectException(InvalidToken::class);
 
         $this->service->cancel($token);
+    }
+
+    /**
+     * Tests that cancelling uncancelleable payment intent throws exception.
+     *
+     * @throws InvalidToken
+     * @throws StripeException
+     * @throws \Stripe\Error\Api
+     */
+    public function testCancellingUncancellablePaymentIntentThrowsException()
+    {
+        $mockPaymentIntent = new PaymentIntent();
+        $mockPaymentIntent->status = 'successful';
+
+        $mockService = $this->getMockBuilder(Service::class)
+            ->setMethodsExcept(['cancel'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockService->expects($this->once())
+            ->method('retrievePaymentIntent')
+            ->willReturn($mockPaymentIntent);
+
+        $this->expectException(AlreadyCanceled::class);
+
+        $token = new Token('some-uid');
+        $token->type = Token::PAYMENT_INTENT;
+        $mockService->cancel($token);
     }
 }

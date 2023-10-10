@@ -232,7 +232,7 @@ class Service implements ServiceInterface
     public function cancel(Token $token): Payment
     {
         if ($token->type === StripeToken::PAYMENT_INTENT) {
-            $intent = PaymentIntent::retrieve($token->value);
+            $intent = $this->retrievePaymentIntent($token->value);
             if (!in_array($intent->status, self::CANCELLABLE_PAYMENT_INTENT_STATUSES)) {
                 throw new AlreadyCanceled();
             }
