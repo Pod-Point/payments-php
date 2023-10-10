@@ -2,7 +2,7 @@
 
 namespace PodPoint\Payments\Providers\Stripe\Payment;
 
-class AlreadyCanceled extends \Exception
+class Uncancelable extends \Exception
 {
     public function __construct()
     {

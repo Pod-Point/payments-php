@@ -227,14 +227,14 @@ class Service implements ServiceInterface
      * @return Payment
      *
      * @throws InvalidToken
-     * @throws AlreadyCanceled
+     * @throws Uncancelable
      */
     public function cancel(Token $token): Payment
     {
         if ($token->type === StripeToken::PAYMENT_INTENT) {
             $intent = $this->retrievePaymentIntent($token->value);
             if (!in_array($intent->status, self::CANCELLABLE_PAYMENT_INTENT_STATUSES)) {
-                throw new AlreadyCanceled();
+                throw new Uncancelable();
             }
 
             $response = $intent->cancel([

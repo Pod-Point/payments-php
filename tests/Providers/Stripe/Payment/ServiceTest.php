@@ -326,7 +326,7 @@ class ServiceTest extends TestCase
             ->method('retrievePaymentIntent')
             ->willReturn($mockPaymentIntent);
 
-        $this->expectException(AlreadyCanceled::class);
+        $this->expectException(Uncancelable::class);
 
         $token = new Token('some-uid');
         $token->type = Token::PAYMENT_INTENT;
