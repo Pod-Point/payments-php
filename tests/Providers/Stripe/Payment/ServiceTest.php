@@ -5,7 +5,7 @@ namespace PodPoint\Payments\Tests\Providers\Stripe\Payment;
 use PodPoint\Payments\Exceptions\InvalidToken;
 use PodPoint\Payments\Payment;
 use PodPoint\Payments\Providers\Stripe\Customer\Service as CustomerService;
-use PodPoint\Payments\Providers\Stripe\Payment\AlreadyCanceled;
+use PodPoint\Payments\Providers\Stripe\Payment\Uncancelable;
 use PodPoint\Payments\Providers\Stripe\Payment\AmountTooLarge;
 use PodPoint\Payments\Providers\Stripe\Payment\Canceled;
 use PodPoint\Payments\Providers\Stripe\Payment\Exception as StripeException;
