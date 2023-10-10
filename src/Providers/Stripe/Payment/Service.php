@@ -35,6 +35,17 @@ class Service implements ServiceInterface
     }
 
     /**
+     * @var array
+     */
+    const CANCELLABLE_PAYMENT_INTENT_STATUSES = array(
+        'requires_payment_method',
+        'requires_capture',
+        'requires_confirmation',
+        'requires_action',
+        'processing'
+    );
+
+    /**
      * Tries to make a payment using the Stripe SDK.
      *
      * @param Token $token
@@ -216,11 +227,15 @@ class Service implements ServiceInterface
      * @return Payment
      *
      * @throws InvalidToken
+     * @throws AlreadyCanceled
      */
     public function cancel(Token $token): Payment
     {
         if ($token->type === StripeToken::PAYMENT_INTENT) {
             $intent = PaymentIntent::retrieve($token->value);
+            if (!in_array($intent->status, self::CANCELLABLE_PAYMENT_INTENT_STATUSES)) {
+                throw new AlreadyCanceled();
+            }
 
             $response = $intent->cancel([
                 'cancellation_reason' => self::CANCELLATION_ABANDONED,
