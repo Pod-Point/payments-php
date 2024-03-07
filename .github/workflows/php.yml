@@ -1,0 +1,34 @@
+name: PHP Composer
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '7.1'
+
+    - name: Copy .env
+      run: cp .env.example .env
+
+    - name: Install dependencies
+      run: composer install --prefer-source --no-interaction
+
+    - name: Run tests
+      env: 
+        STRIPE_KEY: ${{secrets.STRIPE_KEY}}
+      run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
