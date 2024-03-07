@@ -29,4 +29,6 @@ jobs:
       run: composer install --prefer-source --no-interaction
 
     - name: Run tests
+      env: 
+        STRIPE_KEY: ${{secrets.STRIPE_KEY}}
       run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
