@@ -36,3 +36,10 @@ vendor/bin/phpunit
 ```
 
 A test secret key for Stripe will be required to run the tests.
+
+
+## Reviews
+
+| Date | Reviewer | Reason |
+|------|----------|--------|
+| 2026-04-22 | Stephen Hackett | Build dependency for API3 service |
